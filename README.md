@@ -4,4 +4,4 @@
 
 
 + [ECMAScript - 5](/ECMAScript/ECAMScript-5.md)
-+ [ECMAScript - 6](/ECMAScript/ECAMScript-6.md)
++ [ECMAScript - 6](/ECMAScript/ECMAScript-6.md)
