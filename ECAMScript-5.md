@@ -18,3 +18,10 @@ https://www.w3schools.com/js/js_whereto.asp
 + Null
 + Undefined
 + BigInt    for google only
+
+## 引用类型
++ Object
+ - Function
+ - Array
+ - Date
+ - RegExp
