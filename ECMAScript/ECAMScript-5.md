@@ -104,6 +104,64 @@ js引擎通过优化使其运行的更快，不会影响正常代码的执行：
 
 
 ---
+
+### javascript 全局执行上下文
+javascript 的运行环境大概可以分为：
++ 全局环境
++ 函数环境
++ eval
+
+eval 是一个可执行的函数 这个函数可以将字符串转为一段可执行的代码 比如
+```
+ eval('console.log(1)')
+ //这个时候控制台可以打印出 1 
+ 
+```
+但是 eval 这个 不推荐使用 可以用在开发或测试环境来进行调试。
+
+我们将用下面的一段代码来理解执行上下文。
+```
+  var name = 'Alex';
+  function handleCreatePerson(pname,age){
+    var person = {'name':pname || name,'age':18};
+    
+    function handleGo(){
+      console.log('go and see!')
+    }
+     handleGo()
+    function handleSay(){
+      var str ='my name is ' + person.name + "and I'm " + person.age + 'years old';
+      console.log(str);
+    }
+    handleSay()
+  }
+ 
+ handleCreatePerson('Ann',19);
+```
+js引擎会以栈的方式来处理上下文，栈底永远是全局上下文  下面来解读上面的代码：
+```
+// 由于不同环境全局表示不同，这里我们使用global 来指代全局作用域,event_stack表示事件调用栈。
+const global = window;
+const event_stack = []
+// 栈底是全局作用域，或者换个方向想，全局作用域在浏览器打开就存在
+// 所以首先 将全局上下文 入栈
+event_stack.push(global) // 栈内 ['global']
+// 入栈后开始解析读取代码 直到遇到 handleCreatePerson() 这个时候函数执行一定会创建属于他自己的上下文。
+// 于是 handleCreatePerson 入栈 开始解析 函数handleCreatePerson的代码 js是单线程 所以不会在handleCreatePerson后继续进行直到handleCreatePerson代码执行完成。
+event_stack.push(handleCreatePerson) // 栈内 ['global','handleCreatePerson']
+// 就这么走走走 诶  遇到了 handleCreatePeron 的内部函数 handleGo 于是 handleGo入栈
+event_stack.push(handleGo) // 栈内 ['global','handleCreatePerson','handleGo']
+// 当我们遇到handleSay 之前 这个handleGo函数是不是已经执行完毕了？ 所以 他的上下文已经没有用了 要出栈 于是。
+event_stack.pop()   // 栈内 ['global','handleCreatePerson']
+// 然后 遇到handleSay
+event_stack.push(handleSay) // 栈内 ['global','handleCreatePerson','handleSay']
+event_stack.pop()   // 栈内 ['global','handleCreatePerson']
+// 这个时候 handleCreatePerson 也执行完毕
+event_stack.pop()   // 栈内 ['global']
+// 然后继续往下解析代码 最后发现 诶没有了 好代码解析结束  但是我们的全局上下文是不出栈的 只有当窗口关闭 才会释放。
+```
+
+---
 ### 基本数据类型
 + String
 + Number
@@ -154,6 +212,11 @@ if(Flag){//···}
 我们可以确定 typeof Flag 存在的话 是boolean 不存在的话 或者说没有声明的话 是undefined
 if(typeof Flag !== 'undefined' ){//···}
 ```
+注意：
++ js是单线程
++ 代码同步执行，只有栈顶的上下文执行，其他的需要等待。
++ 全局上下文只有一个，当浏览器关闭时出栈。
++ 函数的执行上下文没有限制，理论上可以无限增加。
 
 ---
 ### 类型转换
