@@ -7,7 +7,8 @@ https://www.w3schools.com/js/js_whereto.asp
 
 ### some knowledges
 ```
-  javascript and java are completely different languages,both in concept and design.JavaScript was invented by Brendan Eich in 1995, and became an ECMA standard in 1997.
+  javascript and java are completely different languages,both in concept and design.JavaScript was invented by Brendan Eich in 1995,
+  and became an ECMA standard in 1997.
 ```
 
 ### 堆、栈、值
