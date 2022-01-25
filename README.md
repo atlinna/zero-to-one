@@ -5,3 +5,4 @@
 
 + [ECMAScript - 5](/ECMAScript/ECAMScript-5.md)
 + [ECMAScript - 6](/ECMAScript/ECMAScript-6.md)
++ [算法提升 - （Python版）](/Problem/index.md)
