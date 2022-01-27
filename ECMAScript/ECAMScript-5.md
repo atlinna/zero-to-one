@@ -493,8 +493,88 @@ for (var i = 0; i < 5; i++) {
 
 ---
 
+### this 绑定
++ 默认情况（严格模式/非严格模式）
++ 隐式绑定
++ 显式绑定
++ new关键字绑定
++ 箭头函数（ES6）
+
+#### 默认情况
+**非严格模式：** 在非严格模式下 this 默认指向全局对象
+**严格模式：** 严格模式下，this 会指向 undefined。在严格模式下嗲用函数不会影响默认绑定。
+如下 1：a 默认为全局变量 运行test函数 此时能够打印出结果1 this 默认情况下指向全局对象
+如下 2：当我们将此函数运行在严格模式时，此时会发现爆红，a is not defined，因为严格模式下不能使用默认情况，此时的 this 指向的是 undefined。
+```
+// 1
+a = 1
+function test() {
+    console.log(this.a);
+}
+
+test()
+
+// 2
+'use strict';
+a = 1
+function test(){
+    console.log(this.a);
+}
+test()
+```
+### 隐式绑定
+当函数的引用有**上下文对象**，隐式绑定规则会把函数中的this绑定到这个上下文对象。
+如下： 当我们想要使用对象中的name属性时
+```
+var user = {
+    name: 'lilei',
+    sayHi: sayHi
+}
+
+function sayHi() {
+    console.log('hello, my name is' + this.name);
+}
+
+user.sayHi();
+```
+但是这样的绑定是不牢固的，在某些特定情况下可能会丢失this的绑定
+这种情况叫做**隐式丢失**
+被隐式绑定的函数，如果将引用传递给一个新的变量，那么此时就相当于直接调用函数本身，this 指向 全局对象或 undefined
+```
+var user = {
+    name: 'lilei',
+    sayHi: sayHi
+}
+
+name = 'hanmeimei'
+
+function sayHi() {
+    console.log('hello, my name is ' + this.name || '空');
+}
+
+var handler = user.sayHi;
+handler()
+```
+如下：同上面的情况相同，本质都是直接引用了函数本身，但是通过回调函数传递的方式，实质上相当于变量赋值。
+```
+var user = {
+    name: 'lilei',
+    sayHi: sayHi
+}
+
+name = 'hanmeimei'
+
+function sayHi() {
+    console.log('hello, my name is ' + this.name || '空');
+}
 
 
+function main(func) {
+    func()
+}
+
+main(user.sayHi)
+```
 
 
 
