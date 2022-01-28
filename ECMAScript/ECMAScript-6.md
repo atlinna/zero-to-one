@@ -86,14 +86,88 @@ var b = person1.show3(); b();这是属于 this 指向丢失。
 
 第九个 person1.show4().call(person2) 箭头函数的 this 不会因为 call 改变 所以还是指向 person1
 第十个 person1.show4.call(person2)() 由于show4的this 通过call 显式改变为 person2 所以 箭头函数指向 person2
+答案:
+```
+person1.show1() // person1，隐式绑定，this指向调用者 person1 
+person1.show1.call(person2) // person2，显式绑定，this指向 person2
 
+person1.show2() // window，箭头函数绑定，this指向外层作用域，即全局作用域
+person1.show2.call(person2) // window，箭头函数绑定，this指向外层作用域，即全局作用域
 
+person1.show3()() // window，默认绑定，这是一个高阶函数，调用者是window
+				  // 类似于`var func = person1.show3()` 执行`func()`
+person1.show3().call(person2) // person2，显式绑定，this指向 person2
+person1.show3.call(person2)() // window，默认绑定，调用者是window
 
+person1.show4()() // person1，箭头函数绑定，this指向外层作用域，即person1函数作用域
+person1.show4().call(person2) // person1，箭头函数绑定，
+							  // this指向外层作用域，即person1函数作用域
+person1.show4.call(person2)() // person2
+```
 
+ok 那么如果我们搞定了 普通函数和箭头函数的组合 现在我们可以尝试一个新的 就是在构造函数中， 如下
+```
+var name = 'window'
 
+function Person (name) {
+  this.name = name;
+  this.show1 = function () {
+    console.log(this.name)
+  }
+  this.show2 = () => console.log(this.name)
+  this.show3 = function () {
+    return function () {
+      console.log(this.name)
+    }
+  }
+  this.show4 = function () {
+    return () => console.log(this.name)
+  }
+}
 
+var personA = new Person('personA')
+var personB = new Person('personB')
 
+personA.show1()  // personA
+personA.show1.call(personB) // personB
 
+personA.show2() // personA
+personA.show2.call(personB) // personA
+
+personA.show3()() // window
+personA.show3().call(personB) // personB
+personA.show3.call(personB)() // window
+
+personA.show4()() // personA
+personA.show4().call(personB) // personA
+personA.show4.call(personB)() // personB
+```
+第一个和第二个的区别就是在于 题目使用了 new
+new 操作符的作用：
++ 创建一个新对象
++ 将构造函数的作用域赋给新对象
++ 执行构造函数中的代码 （为新对象添加属性）
++ 返回新对象
+
+也就是说当我们判断作用域在 person 构造函数中的时候 this 指向自身
+有区别的就是我们的show2 因为箭头函数是根据上层作用域来判断 this ，上层作用域是 person 由于我们在new 实例的时候 new 会绑定 this 就是说谁调用这个函数 就指向谁。
+其他没什么区别
+答案：
+```
+personA.show1()  // personA
+personA.show1.call(personB) // personB
+
+personA.show2() // personA
+personA.show2.call(personB) // personA
+
+personA.show3()() // window
+personA.show3().call(personB) // personB
+personA.show3.call(personB)() // window
+
+personA.show4()() // personA
+personA.show4().call(personB) // personA
+personA.show4.call(personB)() // personB
+```
 
 
 
