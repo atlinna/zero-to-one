@@ -822,10 +822,70 @@ console.log(handler1()); // zhang san
 console.log(handler2()); // global change
 
 ```
+**思考：**  
+有这样两个函数 sayHi 和 sayHello 内部代码完全一致 现在思考 两个函数的执行结果是什么？以及他们引用的内部变量是否会被垃圾回收机制清理。
+```
+name = 'global'
+function sayHi() {
+    const user = {
+        name: 'zhang san'
+    }
+    function f() {
+        return this.name
+    }
+    return f.bind(user)
+}
+
+function sayHello() {
+    const user = {
+        name: 'zhang san'
+    }
+    function f() {
+        return this.name
+    }
+    return f.bind(user)
+}
 
 
+console.log(sayHi()());
+handler = sayHello()
+console.log(handler());
+```
+首先 我们能看出他们的执行结果都是 ‘zhang san’ 只不过 sayHi 函数柯里化直接执行 sayHello 是通过一个变量接受返回的函数然后运行。
+然后呢 我们来分析 是否会被垃圾回收机制进行回收
+现在主流浏览器使用的都是标记清除算法，都是从根节点开始遍历 看节点的可达性 我们来看第一个函数 通过一系列的操作返回了一个可执行函数
+然后函数柯里化 执行完毕之后 我们发现并没有保留任何的引用也就是说 在这个地方我们的引用链断开了 这是不可达的 那么运行完毕后一段时间会被清除，
+而我们再来看sayHello 先是通过变量handler 保存了 这个函数的引用，然后再执行 也就是说 我们通过这个 handler 就能够找到 返回的函数
+可达的 会被标记 不会被清除，如果想要清除 只需要再执行完毕后 释放这个指针。 handler = null 这样 我们手动断开了 对这个函数的引用
+将他变为不可达。
 
-
+**思考：**  
+console.log 依次输出的结果是什么呢？
+```
+var num = 1;
+var myObject = {
+    num: 2,
+    add: function () {
+        this.num = 3;
+        (function () {
+            console.log(this.num); 
+            this.num = 4;
+        })();
+        console.log(this.num);
+    },
+    sub: function () {
+        console.log(this.num)
+    }
+}
+myObject.add();
+console.log(myObject.num);
+console.log(num);
+var sub = myObject.sub;
+sub();
+```
+我们来看执行过程 因为add函数中执行是含有上下文的 所以 add 中 this 指向的是 myObject this.num = 3 所以 myObject中的num = 3 然后 立即执行函数 this 指向全局对象  this.num = 4 ，
+也就是头顶那个num = 4 但是 num 是再赋值前打印。 继续往下 声明了一个变量 sub 来接收 sub函数 隐式绑定丢失 this 指向 this 指向全局
+ok 那么 按顺序看下来就是 1 3 3 4 4
 
 
 
