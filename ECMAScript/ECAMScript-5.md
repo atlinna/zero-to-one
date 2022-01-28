@@ -575,6 +575,274 @@ function main(func) {
 
 main(user.sayHi)
 ```
+**显式绑定**：
+javascript中可以通过call，apply方法来改变 this 的指向。
+call(target,...rest) 第一个参数是我们要指向的目标 ，然后是我们 函数需要接受的参数
+如下 我们定义了一个对象 user 合一个方法 sayName 来输出 对象 user 的名称信息
+然后通过 call 方法来改变 this 的指向让其指向 user
+```
+var user = {
+    name: 'zhangsan'
+}
+
+function sayName(age, hobbies) {
+    console.log('hello my name is ' + this.name + ' ' + age + ' ' + hobbies.reduce((prev, item) => prev + ',' + item), '');
+}
+// hello my name is zhangsan 10 football,basketball,swimming 
+
+sayName.call(user, 10, ['football', 'basketball', 'swimming'])
+```
+apply(target,[...rest]) apply方法和call的功能类似，但是apply如果想要给函数传递参数的话，需要以数组的形式传参
+如下：
+```
+var user = {
+    name: 'zhangsan'
+}
+
+function sayName(age, hobbies) {
+    console.log('hello my name is ' + this.name + ' ' + age + ' ' + hobbies.reduce((prev, item) => prev + ',' + item), '');
+}
+
+sayName.apply(user, [10, ['football', 'basketball', 'swimming']])
+```
+在隐式绑定的时候会出现丢失this指向的情况。如果我们更换了显示绑定也就是 call、apply还会不会出现呢？
+
+**bind**
+bind(target)
+ES5中内置了 Function.prototype.bind bing会返回一个绑定了target的函数
+```
+var user = {
+    name: 'zhangsan'
+}
+
+var user1 = {
+    name: 'linken'
+}
+
+function sayName(age, hobbies) {
+    console.log('hello my name is ' + this.name + ' ' + age + ' ' + hobbies.reduce((prev, item) => prev + ',' + item), '');
+}
+
+sayName.apply(user, [10, ['football', 'basketball', 'swimming']])
+sayName.bind(user1)(20, [1, 2, 3])
+```
+
+### native code
+我们可以尝试着去实现一下 bind 
+首先我们可以看一下 bind 的特征
++ bind可以被我们的函数调用 说明 在Function原型中
++ 调用bind 需要传入一个参数target
++ 返回一个已经绑定了target的函数
++ 这个返回的函数可以继续传入参数来调用
+```
+Function.prototype.myBind = function (target) {
+    var _this = this
+    return function () {
+        _this.call(target, ...arguments)
+        // 或是 _this.apply(target,arguments)
+    }
+}
+
+var user = {
+    name: 'zhangsan'
+}
+
+function hello(...rest) {
+    console.log(this, rest);
+}
+
+var handler = hello.myBind(user)
+handler(1, 2, 3, 4, 5)
+```
+一些内置的api也是有能够改变this指向的参数的 比如：下列代码，这个参数的功能和call 与 apply是
+```
+var user = {
+    name: 'zhangsan'
+}
+var arr = [1, 2, 3, 4, 5]
+arr.forEach(function () {
+    console.log(this);
+}, user)
+```
+**new关键字来绑定**
+情人节的时候，我们都听过一个梗叫做 new 一个对象出来 那个被 new 的东西叫做构造函数 但是。
++ js中 ，构造函数只是使用 new 操作符时被调用的 普通函数 （意思就是谁来都一样，只不过后来规定了构造函数需要首字母大写），他们不属于类，也不会实例化类（js是没有类这个概念的，虽然ES6定义了class）
++ js中内置对象函数也是可以用 new 来调用的 这种称为构造函数调用。
++ 并没有构造函数这个东西，只有**构造调用**。
+
+使用 new 来调用函数，会进行一些操作：
++ 创建一个新对象。
++ 将新对象的原型指向构造函数
++ 将新对象绑定为构造函数的this
++ 如果构造函数返回了其他对象则 不变 否则 返回新对象！
+
+根据上面的步骤我们来模拟一下 new 关键字
+```
+function myNew(constructor, ...rest) {
+    let obj = {};
+    obj.__proto__ = constructor.prototype;
+    let ret = constructor.apply(obj, rest);
+    return ret instanceof Object ? ret : obj
+}
+
+function Person(name, age) {
+    this.name = name;
+    this.age = age;
+}
+
+p = myNew(Person, '张三', 18);
+console.log(p);
+let obj = myNew(Object)
+console.log(obj);
+```
+测试正常！
+**代码解析**
+首先创建一个新对象，然后将新对象的原型指向了构造函数，这样我们的对象就能够访问构造函数中的属性，然后 通过 apply 将 对象绑定到了构造函数中 也就是说 对象和构造函数真正的关联起来
+此时 构造函数中的 this 指向了 对象 ，也就相当于 obj['name'] = name;obj['age'] = age; 然后对外返回这个对象或者是构造函数中的对象。
+
+如果 显示改变this指向时传入的是 null 那么默认绑定规则会把this绑定到全局对象中。
+
+更安全的做法是 传入一个空对象，把this绑定到这个对象不会有任何副作用。
+JS中创建一个空对象的方式是Object.create(null) 他会创建一个空对象，但是不会创建Object.prototype 所以 比直接赋值为{}更空 更安全。
+
+**间接引用：**
+```
+function test() {
+    var a = 1;
+    var b = { a: 2, foo: foo };
+    var c = { a: 3 };
+
+
+    console.log(b.foo()); // 2
+
+    var s = (c.foo = b.foo)()
+    console.log(s);
+}
+
+function foo() {
+    console.log(this);
+    return this.a
+}
+
+a = 10
+
+test()
+```
+(c.foo = b.foo)() 相当于直接执行foo函数 this 指向全局对象。
+```
+Function.prototype.myBindTwo = function (obj) {
+    var _this = this
+    var arr = [].slice.call(arguments, 1)
+    var bind_fun = function () {
+        return _this.apply((!this || this === (window || global)) ? obj : this, arr.concat.apply(arr, arguments))
+    }
+    bind_fun.prototype = Object.create(_this.prototype)
+    return bind_fun;
+}
+---------
+function foo() {
+    console.log("name:" + this.name);
+}
+
+var obj = { name: "obj" },
+    obj2 = { name: "obj2" },
+    obj3 = { name: "obj3" };
+
+// 默认绑定，应用软绑定，软绑定把this绑定到默认对象obj
+var fooOBJ = foo.softBind( obj );
+fooOBJ(); // name: obj 
+
+// 隐式绑定规则
+obj2.foo = foo.softBind( obj );
+obj2.foo(); // name: obj2 <---- 看！！！
+
+// 显式绑定规则
+fooOBJ.call( obj3 ); // name: obj3 <---- 看！！！
+
+// 绑定丢失，应用软绑定
+setTimeout( obj2.foo, 10 ); // name: obj
+```
+**箭头函数**  
+ES6新增箭头函数，箭头函数与上面的规则完全不适用，它是靠外层作用域来决定this的指向。
+如下：我们声明了两个函数 sayHi 和 sayHello  
+sayHi 返回了一个箭头函数， sayHello 返回的是普通的function
+然后都通过 call 来改变 this 让其指向 user
+结果发现 handler2 执行后的结果是 global 而 handler1执行的结果是 zhangsan
+这是因为 箭头函数的this 是根据 外层的this指向来判断的
+我们通过call 改变了this 让其指向了 user 这个时候 箭头函数的外层就是 user 所以箭头函数指向 user
+```
+function sayHi() {
+    return () => this.name
+}
+
+function sayHello() {
+    return function () {
+        return this.name
+    }
+}
+
+const user = {
+    name: 'zhang san'
+}
+
+name = 'golbal change'
+
+handler1 = sayHi.call(user)
+handler2 = sayHello.call(user)
+
+console.log(handler1()); // zhang san
+console.log(handler2()); // global change
+```
+但是在之前我们没有箭头函数的时候是如何解决这种问题的呢?
+通过变量来保存上层函数的 this 
+如下：
+代码相似 只不过我们在sayHello函数中声明了一个变量 _this 来保存 sayHello中的this 这样我们的返回函数中使用这个变量就可以啦！
+```
+function sayHi() {
+    return () => this.name
+}
+
+function sayHello() {
+    var _this = this;
+    return function () {
+        return _this.name
+    }
+}
+
+const user = {
+    name: 'zhang san'
+}
+
+name = 'golbal change'
+
+handler1 = sayHi.call(user)
+handler2 = sayHello.call(user)
+
+console.log(handler1()); // zhang san
+console.log(handler2()); // global change
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
