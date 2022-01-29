@@ -942,11 +942,61 @@ console.log(isArray2([1, 2, 3]))
 console.log(isArray2([]))
 console.log(isArray2({}))
 ```
+**类数组：**
+什么是类数组？ 类数组就是一个对象，但是这个对象和数组一样key是用数字索引下标 也有length属性，如arguments 对象 和 dom api 返回的 NodeList 都是类数组对象，
+类数组对象不能使用 push、slice、pop、shift等数组方法，但是可以通过一些办法将类数组转换成数组来使用数组的api
 
+**Array.prototype.slice.call**
+```
+function test() {
+    arguments = Array.prototype.slice.call(arguments)
+    console.log(arguments);
+}
 
+test(1, 2, 3, 4, 5)
+```
+**Array.from**
+Array.from 可以将两类对象转为真正的数组：类数组对象和可遍历对象（iterable） 包括ES6新增的数据结构Map、Set
+```
+function test() {
+    arguments = Array.from(arguments)
+    console.log(arguments);
+}
 
+test(1, 2, 3, 4, 5)
+```
+**扩展操作符方式**
+```
+function  test(){
+ console.log([...arguments])
+}
+```
+为什么要有类数组对象呢？类数组对象解决了什么问题？
+```
+JavaScript类型化数组是一种类似数组的对象，并提供了一种用于访问原始二进制数据的机制。 Array存储的对象能动态增多和减少，并且可以存储任何JavaScript值。JavaScript引擎会做一些内部优化，以便对数组的操作可以很快。然而，随着Web应用程序变得越来越强大，尤其一些新增加的功能例如：音频视频编辑，访问WebSockets的原始数据等，很明显有些时候如果使用JavaScript代码可以快速方便地通过类型化数组来操作原始的二进制数据，这将会非常有帮助。
+```
+总结来说就是 可以更快的操作复杂数据。
 
+**call 和 apply的模拟实现**
+call 和 apply 主要的表现有：
++ 可以改变this的指向
++ 函数通过调用call 和 apply 函数执行
+```
+// call
+Function.prototype.myCall = function (target) {
+    let args = [].slice.call(arguments).splice(1)
+    target.handler = this
+    target.handler(...args)
+    delete target.handler
+}
 
+// apply
+Function.prototype.myApply = function (target, args = []) {
+    target.handler = this
+    target.handler(...args)
+    delete target.handler;
+}
+```
 
 
 
