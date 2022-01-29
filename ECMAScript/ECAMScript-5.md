@@ -887,8 +887,61 @@ sub();
 也就是头顶那个num = 4 但是 num 是再赋值前打印。 继续往下 声明了一个变量 sub 来接收 sub函数 隐式绑定丢失 this 指向 this 指向全局
 ok 那么 按顺序看下来就是 1 3 3 4 4
 
+**call 和 apply的应用**
+call 和 apply 都能用来改变 this 的指向 ，唯一的不同点就是 call 是接受多个参数列表 而 apply 是接受多个参数列表组成的数组。 
+下面我们一起来看下 call 和 apply的应用
+- 合并两个数组
+```
+arr1 = [1, 2, 3]
+arr2 = [4, 5, 6]
+Array.prototype.push.apply(arr1, arr2)
+console.log(arr1) // [1,2,3,4,5,6]
+```
+```
+// 将数组分为 n 个 一组的数组
+function cut(arr = [], n = 3) {
+    if (n < 1) {
+        throw new Error('请输入整数的分组')
+    }
+    if (arr.length == 0) {
+        return []
+    }
+    let ret = [];
+    let len = Math.ceil(arr.length / n)
+    for (let i = 0; i < len; i++) {
+        Array.prototype.push.call(ret, arr.slice(i * n, i * n + n))
+    }
+    return ret
+}
+```
+- 获取数组中的最大值与最小值
+Math.max() 返回参数列表中的最大值
+Math.min() 返回参数列表中的最小值
+```
+Math.max.apply(Math,[1,2,3,4])
+Math.min.apply(Math,[1,2,3,4])
+```
+- 判断是否为数组
+可以通过toString() 来获取每个对象的类型，但是不同对象的 toString()有不同的实现，所以通过 Object.prototype.toString() 来检测，
+需要以 call() / apply() 的形式来调用，传递要检查的对象作为第一个参数。
+```
+function isArray(obj) {
+    return Object.prototype.toString.call(obj) === '[object Array]'
+}
 
+console.log(isArray([1, 2, 3])) // true
+console.log(isArray([])) // true
+console.log(isArray({})) // false
 
+var dataToStr = Function.prototype.call.bind(Object.prototype.toString)
+function isArray2(obj) {
+    return dataToStr(obj) === '[object Array]'
+}
+
+console.log(isArray2([1, 2, 3]))
+console.log(isArray2([]))
+console.log(isArray2({}))
+```
 
 
 
