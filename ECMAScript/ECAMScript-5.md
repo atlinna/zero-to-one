@@ -981,20 +981,27 @@ JavaScript类型化数组是一种类似数组的对象，并提供了一种用�
 call 和 apply 主要的表现有：
 + 可以改变this的指向
 + 函数通过调用call 和 apply 函数执行
++ call 和 apply 可以传入 null 和 undefined 此时的this 应该指向window
++ 可以传入基本数据类型，此时会使用Object 来转换
++ 函数可以有返回值
 ```
 // call
 Function.prototype.myCall = function (target) {
-    let args = [].slice.call(arguments).splice(1)
-    target.handler = this
-    target.handler(...args)
-    delete target.handler
+    target = target ? Object(target) : window;
+    let args = [].slice.call(arguments).splice(1);
+    target.handler = this;
+    let ret = target.handler(...args);
+    delete target.handler;
+    return ret;
 }
 
 // apply
 Function.prototype.myApply = function (target, args = []) {
-    target.handler = this
-    target.handler(...args)
+    target = target ? Object(target) : window;
+    target.handler = this;
+    let ret = target.handler(...args);
     delete target.handler;
+    return ret;
 }
 ```
 
