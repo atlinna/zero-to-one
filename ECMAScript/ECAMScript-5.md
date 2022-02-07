@@ -1005,6 +1005,73 @@ Function.prototype.myApply = function (target, args = []) {
 }
 ```
 
+**bind 的用法与原理**
+bind 的作用与 call 和 apply 相同 都是能够改变this的指向。 与他们不同的是 bind 是返回一个新的函数，这个函数的this绑定的是我们传入的第一个参数。
+bind有以下特征：
++ 可以指定this
++ 返回一个函数
++ 可以传入参数
++ 柯里化
+```
+function Person(name) {
+    this.name = name;
+    this.askTalk = function () {
+        setTimeout(function () {
+            console.log(this.name);
+        }.bind(this))
+    }
+}
+
+var p = new Person('John')
+p.askTalk()
+```
+```
+function isArrays(obj) {
+    let tred = Object.prototype.toString.call(obj);
+    console.log(tred);
+    return tred === '[object Array]'
+}
+
+console.log(isArrays([1, 2, 3]));
+console.log(isArrays({ name: 1, age: 2, }));
+console.log(isArrays(true));
+console.log(isArrays(1));
+console.log(isArrays('1'));
+console.log(isArrays(function () { }));
+
+
+[object Array]
+ true
+[object Object]
+ false
+[object Boolean]
+ false
+[object Number]
+ false
+[object String]
+ false
+[object Function]
+ false
+```
+模拟bind实现 2
+我们会发现当 bind 返回了一个新函数 我们给bind 和 新函数同时传递参数 ，参数列表里是合并后的参数。
+```
+function hello(...rest) {
+    console.log(rest);
+}
+
+Function.prototype.myBlend = function () {
+    arguments1 = Array.prototype.slice.call(arguments)
+    let target = arguments1.shift(0)
+    let self = this
+    return function () {
+        return self.apply(target, arguments1.concat([...arguments]))
+    }
+}
+
+var s = hello.myBlend(obj, 1, 2, 3)
+s(4, 5, 6)
+```
 
 
 
