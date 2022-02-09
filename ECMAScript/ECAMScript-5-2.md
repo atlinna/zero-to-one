@@ -18,6 +18,7 @@ console.log(p.sayName());
 + 可以访问构造函数中的属性
 + 可以范文原型中的属性
 
+- - -
 **模拟实现**
 实现前要先分析 
 假设 我们现在运行 new Person
@@ -83,8 +84,83 @@ console.log(a, a_a);
 ```
 我们来分析一下上面的行为 首先创建了一个对象 a a中 有两个属性分别是基本数据和引用数据 ，现在又创建了一个对象a_a 来接受Object.assign合并后的值 目标对象是 ‘{}’ 
 当我们修改a中的基本数据时，发现这个浅拷贝是好用的 两个对象互不影响，可是 当我们修改引用类型的时候 我们发现所有的值都变了。
+```
+let a = {
+    name: 'zhangsan',
+    age: '19',
+    like: null,
+    id: Symbol('zhangsan'),
+    next: undefined
+}
+
+let b = Object.assign({}, a)
+
+console.log(a,b);
+```
+String 类型 和 Symbol 类型的属性都会被拷贝，而且不会跳过那些值为null 或 undefined 的源对象。
+**Object.assign 的模拟实现**  
+首先我们看下Object.assign的特征：
++ 1、判断原生 Object 是否支持该函数，如果不存在的话创建一个函数 assign，并使用 Object.defineProperty 将该函数绑定到 Object 上。
++ 2、判断参数是否正确 目标对象不能为空，可以为空对象但是不能不设置值。
++ 3、使用Object（）转成对象，并保存为 to ，最后返回这个对象 to。
++ 4、使用 for ··· in 循环遍历出所有可枚举的自由属性。并复制给新的目标对象（使用hasOwnProperty 获取自由属性，即非原型链上的属性）。
+代码实现：
+```
+if (typeof Object.myAssign !== 'function') {
+    Object.defineProperty(Object, 'myAssign', {
+        value: function (target) {
+            if (target == null) {
+                throw new Error('Cannot Convert null to object')
+            }
+            var to = Object(target)
+
+            for (var i = 1; i < arguments.length; i++) {
+                var propSource = arguments[i]
+                if (propSource) {
+                    for (var prop in propSource) {
+                         if (Object.prototype.hasOwnProperty.call(propSource, prop)) {
+                             to[prop] = propSource[prop]
+                         }
+                    }
+                }
+            }
+
+            return to
+        },
+        writable: true,
+        configurable: true
+    })
+}
+
+var b = Object.myAssign({}, { name: 'zhangsan' }, { age: 18 });
+console.log(b);
+
+注意：
+1、可枚举性
+原生情况下挂载在Object上的属性是不可枚举的，但是直接在Object上挂载属性是可枚举的，所以这里必须使用Object.defineProperty,并设置enumerable:false,writable:true,configurable:true.
+for (var key in Object) {
+    console.log(key);
+}
+console.log(Object.keys(Object));
+我们也可以使用Object.getOwnPropertyDescriptor 或者Object.propertyIsEnumerable 来查看Object.assign 是否可枚举
+console.log(Object.getOwnPropertyDescriptor(Object, 'assign')); // 可以看到defineProperty的配置对象
+ {
+        writable: true, // 可写
+        enumerable: false, // 可枚举
+        configurable: true, // 可配置
+        value: ƒ
+    }
+2、判断参数是否正确
+有些文章判断参数是否正确是这样判断的
+if(target === undefined || target === null){
+    throw new TypeError('Cannot convert undefined or null to object!')
+}
+这样写就没有必要了，因为 undefined 和 null 是相等的 即 undefined == null 为 true，
+所以我们只需要判断 我们的目标对象 是否等于 null 即可。
+```
+
 2、ES6 展开操作符 （浅拷贝）
-3、Array.prototype.slice()
+3、Array.prototype.slice() （浅拷贝）
 slice 方法返回一个新的数组对象，这一对象是一个由begin 和 end（不包括end）决定的原数组的浅拷贝，原始数组不会改变
 ```
 let arr = [1, '2', 3, [4, 5]]
@@ -95,3 +171,150 @@ arr[3][0] = 2
 console.log(brr);
 ```
 我们发现改变 arr[0]的值 brr 中的值没有改变 但是改变 arr[3][0]的值后 brr[3][0]的值也跟着改变 说明 slice 方法是浅拷贝。 **相应的还有 concat**
+
+**深拷贝**
+深拷贝会拷贝所有的属性，并且拷贝属性指向的内存，就相当于把源对象及对象中所有的属性（基本数据，引用数据）全部拷贝即为深拷贝。
+深拷贝相比于浅拷贝速度慢，花销大 看情况使用。
+
+**深拷贝使用场景**
+1、JSON.parse(JSON.stringify(Object))
+```
+var a = {
+    name: 'zhangsan',
+    age: 19,
+    books: {
+        nature: 'people of nature',
+        technology: 'Bill Gates'
+    }
+};
+
+var b = JSON.parse(JSON.stringify(a));
+
+console.log(a, b);
+a.name = 'li si';
+console.log(a, b);
+b.books.nature = 'Man And Nature';
+console.log(a, b);
+```
+发现改变不同的数据 两个对象之间互不影响。
+再试试对数组的深拷贝
+```
+var a = [1, 2, 3, [4, 5]]
+
+var b = JSON.parse(JSON.stringify(a))
+
+console.log(a, b);
+a[0] = 10
+console.log(a, b);
+b[3][1] = 0
+console.log(a, b);
+```
+对数组深拷贝之后，改变原数组不会影响到拷贝之后的数组。
+但是使用JSON API 实现深拷贝是有弊端的
++ 1、如果obj中存在时间对象，深拷贝后时间是字符串形式，而不是对象的形式
++ 2、如果obj中有RegExp，则打印出来是空对象
++ 3、如果obj中有函数或者undefined，则会直接被丢弃
++ 4、如果对象是由构造函数生成，则会丢掉对象的constructor
++ 5、如果对象中存在循环引用的情况，无法正确实现深拷贝
++ 6、如果对象中存在NaN，则序列化后会变成null
+下面我们来看下这些问题：
+```
+// 1、如果obj中存在时间对象，深拷贝后时间是字符串形式，而不是对象的形式
+var obj = {
+    time: new Date()
+}
+
+var a = JSON.parse(JSON.stringify(obj))
+
+console.log(obj, typeof obj.time, a, typeof a.time); 
+// {time: Wed Feb 09 2022 14:56:13 GMT+0800 (中国标准时间)}time: Wed Feb 09 2022 14:56:13 GMT+0800 (中国标准时间) {}__proto__: Object "object"
+/* {time: "2022-02-09T06:56:13.002Z"} "string"
+time: "2022-02-09T06:56:13.002Z"
+__proto__: Object
+*/
+/*
+    我们发现深拷贝之后的数据变成了字符串，这个如何解决呢？ 我们把日期对象转为时间戳
+*/
+var obj = {
+    time: (new Date()).valueOf()
+}
+
+var a = JSON.parse(JSON.stringify(obj))
+
+console.log(obj, typeof obj.time, a, typeof a.time);
+/*现在我们转换后的数据是不是就一致了*/
+
+// -------------------------------------------------
+// 2、如果obj中有RegExp，则打印出来是空对象
+var obj = {
+    reg: new RegExp(/\/\.{1,10}/)
+}
+
+var a = JSON.parse(JSON.stringify(obj))
+
+console.log(obj, a);
+// 我们发现经过深拷贝之后 a 变为了 空对象。
+// -------------------------------------------------
+// 3、如果obj中有函数、Symbol 或者 undefined，则会直接被丢弃
+var obj = {
+    a: function () { },
+    b: undefined,
+    c: Symbol('hello')
+}
+
+var a = JSON.parse(JSON.stringify(obj))
+
+console.log(obj, a);
+
+// -------------------------------------------------
+// 4、如果对象是由构造函数生成，则会丢掉对象的constructor
+function Person(name, age) {
+    this.name = name;
+    this.age = age;
+}
+
+let p = new Person('zhangsan', 19)
+
+var obj = {
+    person: p
+}
+
+
+let b = JSON.parse(JSON.stringify(p))
+
+console.log(obj, b);
+console.log(p instanceof Person, b instanceof Person);
+// 发现此时经过深拷贝后的对象原型已经不再指向我们的构造函数
+// -------------------------------------------------
+// 5、如果对象中存在循环引用的情况，无法正确实现深拷贝
+var a = {
+    name: 'zhangsan'
+}
+
+a.a = a;
+
+console.log(a);
+
+var b = JSON.parse(JSON.stringify(a))
+console.log(a, b);
+/*
+    Uncaught TypeError: Converting circular structure to JSON
+    --> starting at object with constructor 'Object'
+    --- property 'a' closes the circle
+    at JSON.stringify (<anonymous>)
+*/
+// -------------------------------------------------
+
+// 6、如果对象中存在NaN，则序列化后会变成null
+var a = {
+    num:NaN
+}
+
+
+var b = JSON.parse(JSON.stringify(a))
+console.log(a, b);
+
+// -------------------------------------------------
+
+```
+
