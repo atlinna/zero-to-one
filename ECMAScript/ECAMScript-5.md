@@ -1072,13 +1072,44 @@ Function.prototype.myBlend = function () {
 var s = hello.myBlend(obj, 1, 2, 3)
 s(4, 5, 6)
 ```
+练习
+```
+var obj = {
+    say: function () {
+        // this -> window
+        function _say() {
+            console.log(this);
+        }
+        console.log(obj);  // undefined
+        return _say.bind(obj)
+    }()
+}
 
+obj.say()
+```
+用JS 实现一个无线累加的函数add，实例如下
+```
+  // add(1)
+  // add(1)(2)
+  // add(1)(2)(3)
+  // add(1)(2)(3)(4)
+  
+  function add(a) {
+	function sum(b) { // 使用闭包
+    	a = a + b; // 累加
+    	return sum;
+ 	}
+ 	sum.toString = function() { // 重写toString()方法
+        return a;
+    }
+ 	return sum; // 返回一个函数
+}
 
-
-
-
-
-
+add(1); // 1
+add(1)(2);  // 3
+add(1)(2)(3) // 6
+add(1)(2)(3)(4) // 10 
+```
 
 
 
