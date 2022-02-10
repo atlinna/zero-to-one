@@ -12,3 +12,4 @@ https://leetcode-cn.com/leetbook/read/linked-list/x6ybqh/
   - [答案推荐来自“起个什么名字好呢”大神，使用了三种方式来解题。值得一看](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/solution/san-chong-fang-fa-shan-chu-dao-shu-di-nge-jie-dian/)
 + [交换节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs/)
   - https://leetcode-cn.com/problems/swap-nodes-in-pairs/solution/acm-xuan-shou-tu-jie-leetcode-jiao-huan-wdymm/
++ [25. K 个一组翻转链表](https://leetcode-cn.com/problems/reverse-nodes-in-k-group/)
