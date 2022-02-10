@@ -318,4 +318,158 @@ console.log(a, b);
 // -------------------------------------------------
 
 ```
+**浅拷贝的实现：** 
+```
+var shallowCopy = function (target) {
+    var to = new Object();
+    for (var prop in target) {
+        if (Object.prototype.hasOwnProperty.call(target, prop)) {
+            to[prop] = target[prop];
+        }
+    }
+    return to
+}
 
+
+var a = {
+    name: 'zhang san',
+    age: 18,
+    book: {
+        title: 'Man And Nature',
+        price: 100
+    }
+}
+
+var b = shallowCopy(a)
+console.log(b);
+a.name = 'li si';
+console.log(b);
+a.book.title = 'People of Nature';
+console.log(b);
+```
+**实现深拷贝：**
+```
+Object.defineProperty(Object, 'cloneDeep', {
+    value: function (target) {
+        var source = {};
+        for (var prop in target) {
+            if (Object.prototype.hasOwnProperty.call(target, prop)) {
+                if (typeof target[prop] == 'object') {
+                    source[prop] = Object.cloneDeep(target[prop])
+                } else {
+                    source[prop] = target[prop]
+                }
+            }
+        }
+        return source;
+    },
+    writable: false,
+    configurable: true
+})
+
+var a = {
+    name: 'zhang san',
+    age: 18,
+    book: {
+        title: 'Man And Nature',
+        price: 19
+    }
+}
+
+var b = Object.cloneDeep(a)
+a.book.title = 'People of Nature';
+console.log(a, b);
+```
+测试通过 这样就完成了一个简单的深拷贝， 但是这样的深拷贝会存在一些问题
++ 没有正确的判断入参的类型 和 返回参数的类型 比如 如果参数为null 返回的 却是一个空对象。
++ 不能兼容数组
++ 重复引用问题
+接下来我们依次完善我们的深拷贝
+首先我们解决参数类型的问题
+```
+/*
+    之前我们通过一些方式来判断参数是否为数组，同样我们可以用这种方式来判断我们的参数是否是 对象
+*/
+Object.prototype.isObj = function (target) {
+    return Object.prototype.toString.call(target) == '[object Object]';
+}
+// 修改我们 deepClone 的代码
+Object.prototype.isObj = function (target) {
+    return Object.prototype.toString.call(target) == '[object Object]';
+}
+Object.defineProperty(Object, 'cloneDeep', {
+    value: function (target) {
+        if (!Object.isObj(target)) return target // 判断是否是对象 如果不是则返回此类型
+        var source = {};
+        for (var prop in target) {
+            if (Object.prototype.hasOwnProperty.call(target, prop)) {
+                if (Object.isObj(target[prop])) {
+                    source[prop] = Object.cloneDeep(target[prop])
+                } else {
+                    source[prop] = target[prop]
+                }
+            }
+        }
+        return source;
+    },
+    writable: false,
+    configurable: true
+})
+
+var a = {
+    name: 'zhang san',
+    age: 18,
+    book: {
+        title: 'Man And Nature',
+        price: 19
+    }
+}
+
+a = null
+
+var b = Object.cloneDeep(a)
+// a.book.title = 'People of Nature';
+console.log(a, b);
+
+/*测试正常 不是对象类型的都会返回对应值*/
+/*
+    我们来看下一个兼容数组，我们想一下如果要兼容数组的话 我们用来判断对象的方式，是不是就不妥当了，因为如果是数组的话 返回的应该是[object Array] 
+    所以我们这里判断类型还是要使用 typeof 但是如果使用typeof的话要注意一些小细节
+    typeof null // object
+    typeof {} // object
+    typeof [] // object
+ */
+Object.prototype.isObj = function (target) {
+    return target && typeof target === 'object';
+}
+Array.prototype.isArray = function (target) {
+    return Object.prototype.toString.call(target) === '[object Array]'
+}
+Object.defineProperty(Object, 'cloneDeep', {
+    value: function (target) {
+        if (!Object.isObj(target)) return target // 判断是否是对象 如果不是则返回此类型
+        var source = Array.isArray(target) ? [] : {}; // 兼容数组
+        for (var prop in target) {
+            if (Object.prototype.hasOwnProperty.call(target, prop)) {
+                if (Object.isObj(target[prop])) {
+                    source[prop] = Object.cloneDeep(target[prop])
+                } else {
+                    source[prop] = target[prop]
+                }
+            }
+        }
+        return source;
+    },
+    writable: false,
+    configurable: true
+})
+
+// 测试一下
+var a = [1, 2, 3, [4, 5]]
+var b = Object.cloneDeep(a)
+a[3][1] = 10
+console.log(a, b);
+/* 测试正常，能够兼容数组 */
+/* 下一个问题，重复引用的问题，解决这个问题的本质是找到并返回重复引用的地方就可以了？ */
+
+```
