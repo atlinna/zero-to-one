@@ -471,5 +471,172 @@ a[3][1] = 10
 console.log(a, b);
 /* 测试正常，能够兼容数组 */
 /* 下一个问题，重复引用的问题，解决这个问题的本质是找到并返回重复引用的地方就可以了？ */
+Object.prototype.isObj = function (target) {
+    return target && typeof target === 'object';
+}
+Array.prototype.isArray = function (target) {
+    return Object.prototype.toString.call(target) === '[object Array]'
+}
 
+function findFlag(list, target) {
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].target === target) {
+            return list[i];
+        }
+    }
+    return null;
+}
+
+Object.defineProperty(Object, 'cloneDeep', {
+    value: function (target, flagStack) {
+        if (!Object.isObj(target)) return target // 判断是否是对象 如果不是则返回此类型
+        if (!flagStack) flagStack = []; // 新增代码，初始化数组
+        var source = Array.isArray(target) ? [] : {}; // 兼容数组
+        var dta = findFlag(flagStack, target)
+
+        if (dta) return dta.source
+        flagStack.push({
+            source,
+            target
+        })
+        for (var prop in target) {
+            if (Object.prototype.hasOwnProperty.call(target, prop)) {
+                if (Object.isObj(target[prop])) {
+                    source[prop] = Object.cloneDeep(target[prop], flagStack)
+                } else {
+                    source[prop] = target[prop]
+                }
+            }
+        }
+        return source;
+    },
+    writable: false,
+    configurable: true
+})
+
+// 测试一下
+// var a = [1, 2, 3, [4, 5]]
+// var b = Object.cloneDeep(a)
+// a[3][1] = 10
+// console.log(a, b);
+var a = {
+    s: 'obj'
+}
+a.tina = a
+var b = Object.cloneDeep(a)
+console.log(b);
+/*测试正常*/
+
+// 还有第二种方式就是使用哈希表，但是 WeakMap 是 ES6中的知识。
+Object.defineProperty(Object, 'cloneDeep', {
+    value: function (target, hashmap = new WeakMap()) {
+        if (!Object.isObj(target)) return target // 判断是否是对象 如果不是则返回此类型
+        if (hashmap.has(target)) return hashmap.get(target)
+        var source = Array.isArray(target) ? [] : {}; // 兼容数组
+        hashmap.set(target, source)
+        for (var prop in target) {
+            if (Object.prototype.hasOwnProperty.call(target, prop)) {
+                if (Object.isObj(target[prop])) {
+                    source[prop] = Object.cloneDeep(target[prop], hashmap)
+                } else {
+                    source[prop] = target[prop]
+                }
+            }
+        }
+        return source;
+    },
+    writable: false,
+    configurable: true
+})
+
+// 测试一下
+// var a = [1, 2, 3, [4, 5]]
+// var b = Object.cloneDeep(a)
+// a[3][1] = 10
+// console.log(a, b);
+var a = {
+    s: 'obj'
+}
+a.tina = a
+var b = Object.cloneDeep(a)
+console.log(b);
+```
+有的同学就会发现了 说 我们用的都是递归的方式，那么就会存在递归爆栈的问题 
+爆栈 --》 RangeError: Maximum call stack size exceeded
+了解算法的同学可能会更好的了解 递归可以转化成while循环的方式。
+```
+Object.prototype.isObj = function (target) {
+    return target && typeof target === 'object';
+}
+Array.prototype.isArray = function (target) {
+    return Object.prototype.toString.call(target) === '[object Array]'
+}
+
+function findFlag(list, target) {
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].target === target) {
+            return list[i];
+        }
+    }
+    return null;
+}
+
+Object.defineProperty(Object, 'cloneDeep', {
+    value: function (target) {
+
+        if (!Object.isObj(target)) return target // 判断是否是对象 如果不是则返回此类型
+        var source = Array.isArray(target) ? [] : {}; // 兼容数组   
+
+        const loopList = [
+            {
+                parent: source,
+                key: undefined,
+                data: target
+            }
+        ]
+
+        while (loopList.length) {
+            let node = loopList.pop();
+            let parent = node.parent;
+            let key = node.key;
+            let data = node.data;
+            let ret = parent;
+            if (key !== undefined) {
+                ret = parent[key] = Array.isArray(target) ? [] : {}
+            }
+
+            for (let prop in data) {
+                if (data.hasOwnProperty(prop)) {
+                    if (Object.isObj(data[prop])) {
+                        loopList.push({
+                            parent: ret,
+                            key: prop,
+                            data: data[prop]
+                        })
+                    } else {
+                        ret[prop] = data[prop]
+                    }
+                }
+            }
+
+        }
+        return source
+    },
+    writable: false,
+    configurable: true
+})
+
+var a = {
+    name: 'zhang san',
+    age: 18,
+    book: {
+        title: 'Man And Nature',
+        price: 19
+    }
+}
+
+var b = Object.cloneDeep(a)
+console.log(a, b);
+a.book.title = 'People of Nature'
+console.log(a, b);
 ```
