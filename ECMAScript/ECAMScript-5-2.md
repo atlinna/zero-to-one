@@ -640,7 +640,7 @@ console.log(a, b);
 a.book.title = 'People of Nature'
 console.log(a, b);
 ```
-**Lodash 中的深拷贝是如何实现的：**  
+**Lodash 中的深拷贝是如何实现的：**  https://github.com/yygmind/blog/issues/31  
 整体流程
 入口文件是cloneDeep.js，直接调用核心文件baseClone.js的方法
 ```
@@ -665,6 +665,8 @@ function cloneDeep(value) {
 + key: 传入value值的key
 + object: 传入value值的父对象
 + stack: Stack 栈， 用来处理循环引用
+
+完整代码：
 ```
 function baseClone(value, bitmask, customizer, key, object, stack) {
     let result
@@ -774,3 +776,58 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
 + 循环引用
 + Map & Set
 + Symbol & 原型链
+
+#### 位掩码
+位掩码参数定义如下
+```
+const CLONE_DEEP_FLAG = 1   // 1 即 0001，深拷贝标志位
+const CLONE_FLAT_FLAG = 2   // 2 即 0010，拷贝原型链标志位
+const CLONE_SYMBOLS_FLAG = 4    // 4 即 0100，拷贝 Symbols 标志位
+```
+位掩码用于处理同时存在多个布尔选项的情况，其中**掩码中的每个选项的值都等于 2 的幂。** 相比直接使用变量来说，优点是可以节省没存
+```
+ // cloneDeep 添加标志位，1|4 即 0001 | 0100 即 0101 即 5
+ CLONE_DEEP_FLAG | CLONE_SYMBOLS_FLAG
+ 
+ let result;
+ const isDeep = bitmask & CLONE_DEEP_FLAG   // 5 & 1 即 1 true
+ const isFlat = bitmask & CLONE_FLAT_FLAG   // 5 & 2 即 0 false
+ const isFull = bitmask & CLONE_SYMBOLS_FLAG    // 5 & 4 即 4 true
+```
+常用的基本操作如下：
++ a | b: 添加标志位 a 和 b
++ mask & a: 去除标志位 a
++ mask & ~a: 清除标志位 a
++ mask ^ a: 取出与 a 的不同部分
+
+#### 定制 clone 函数
+```
+if (customizer) {
+	result = object ? customizer(value, key, object, stack) : customizer(value)
+}
+if (result !== undefined) {
+    return result
+}
+```
+上面代码是当存在 customizer 的情况时 如果 存在 value 值的父对象，就传入 value，key，object，stack 这几个参数，如果不存在 value 的父对象 object 则只传入 value 执行定制函数。
+函数的返回值 result 不为空则返回执行结果。
+
+#### 非对象
+```
+if (!isObject(value)) {
+    return value;
+}
+
+// ../isObject.js
+function isObject(value) {
+    const type = typeof value;
+    return value != null && (type == 'object' || type ='function');
+}
+```
+这里判断 value 是否为对象，如果不是则直接返回这个值，用来判断对象的方法和我们的相差不大，只不过他这里多了一个 function 类型
+
+
+
+
+
+
