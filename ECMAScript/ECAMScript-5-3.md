@@ -262,30 +262,277 @@ __proto__属性指向的是上一个原型，也就是说 我们一直在取上�
 + 每个对象拥有一个原型对象，通过 __proto__ 指针指向上一个原型，并从中继承方法和属性，同时原型对象也可能拥有原型，这样一层一层，最终指向null，这就是原型链。 
 
 - - -
+**注意：对象是通过 __proto__ 指向上一个原型，并继承方法和属性** 
+用到的是继承而不是复制
+```
+function Person(name) {
+    this.name = name;
+}
+
+Person.prototype.length = 101;
+
+var p = new Person('zhang san');
+console.log(p.__proto__);
+```
+我们会发现 结果中存在 length 属性。
+
+**原型上的属性和方法定义在 prototype 对象上，而非对象实例本身/当访问一个对象的属性/方法时,它不仅仅在该对象上查找，还会查找该对象的原型，以及该对象的原型的原型，一层一层往上找，
+直到找到一个名字匹配的属性/方法或者到达原型的最顶层 null 。**
+
+
+思考如果调用 person.valueOf() 会发生什么？
++ 首先会检查 person 对象上是否具有可用的 valueOf 方法。
++ 如果没有，则会向上查找 person 对象的原型对象 (person.__proto__ 即 Person.prototype) 是否具有可用的 valueOf 方法。
++ 如果没有，则继续向上查找 person 的原型对象的原型对象 (person.__proto__.__proto__ 即 Object.prototype) 看是否存在可用的 valueOf 方法。此时找到了 valueOf 方法执行
+```
+function Person(name) {
+    this.name = name;
+}
+
+
+var p = new Person('zhang san');
+console.log(p.valueOf(),p);
+```
+
+#### prototype 和 __proto__
+区别：
+原型对象 prototype 是构造函数上的属性， __proto__ 是每个实例上都有的属性，两个属性不同但是指向的是同一个对象。
+
+
+那么原型链的构建是依赖于 prototype 还是 __proto__ 呢？
+[如图](https://camo.githubusercontent.com/20b790bd15137b6aa77ddc1ce17a60ed2a772d8807cc6886dd1e2185052d7d75/68747470733a2f2f322e62702e626c6f6773706f742e636f6d2f2d3269694c57367774454f302f55477444582d5a505f6f492f41414141414141414166512f46705346434567316b37512f73313630302f4a6176617363726970742b50726f746f747970616c2b496e6865726974616e63652b4469616772616d2b2d2b6772616e642b706963747572652b2833292e706e67) 
+如上图所示，我们会发现在原型链中 Foo.prototype 中的 prototype 并没有狗哼一条原型链，它只是指向了原型链中的某一处位置。 原型链的构建依赖于 __proto__， 如上图中 foo.__proto__ 指向 Foo.prototype ， foo.__proto__.__proto__ 指向 Bichon.prototype 如此一层一层最终链接到 null 。
+
+**注意： 不要使用 Bar.prototype = Foo ,因为这不会执行 Foo 的原型，而是指向函数 Foo ，因此原型链将会链接到 Function.prototype 而不是 Foo.prototype ,因此 methods 方法不会再 Bar
+ 的原型链上。**
+```
+function Foo() {
+    return 'foo'
+}
+
+Foo.prototype.methods = function () {
+    return 'method'
+}
+
+function Bar() {
+    return 'bar'
+}
+
+Bar.prototype = Foo
+let bar = new Bar()
+console.log(bar);
+```
+
+#### instanceOf 的原理
+instanceOf 运算符用来检测 constructor.prototype 是否在参数的原型链上
+```
+function Person() {
+
+}
+
+function People() {
+
+}
+
+var p = new Person()
+
+console.log(p instanceof Person); // true   Object.getPrototypeOf(p) === Person.prototype
+console.log(p instanceof People); // false
+console.log(Object.getPrototypeOf(p) === Person.prototype);
+```
+**instanceOf原理就是:一层一层查找 __proto__，如果和 constructor.prototype 相等 则返回 true ，如果一直没有查找成功则返回 false**  
+```
+  instance.[__proto__...] === instance.constructor.prototype
+```
+那么我们知道了原理就来浅试一下 实现 instanceOf：
+```
+function myInstanceOf(A, B) {
+    var target = B.prototype;
+    while (A.__proto__) {
+        if (A.__proto__ === target) {
+            return true;
+        }
+        A = A.__proto__;
+    }
+    return false;
+}
+
+function Person() {
+
+}
+
+function People() {
+
+}
+
+var p = new Person();
+
+console.log(p instanceof Person); // true   Object.getPrototypeOf(p) === Person.prototype
+console.log(p instanceof People); // false
+console.log(Object.getPrototypeOf(p) === Person.prototype);
+
+
+console.log(myInstanceOf(p, Person));  // true
+console.log(myInstanceOf(p, People));  // false
+```
+
+#### 原型链继承
+原型链继承的本质就是重写原型对象，用一个新的要继承的实例来替代。 新的原型 Solder 不仅有 new Person() 实例上的全部属性和方法，并且由于指向了 Person 原型，所以还拥有 Person 原型上的所有方法和属性。
+```
+function Person() {
+    this.name = 'zhang san';
+}
+
+Person.prototype.run = function () {
+    console.log(this.name + ' is running!');
+}
+
+function Solder() {
+
+}
+
+
+Solder.prototype = new Person()
+var s = new Solder()
+console.log(s);
+s.name = 'li si'
+s.run()
+```
+
+原型链继承方案有以下缺点：
++ 多个实例对引用类型的操作会被篡改
++ 子类型的原型上的 constructor 属性被重写了
++ 给子类型原型添加属性和方法必须在替换原型之后
++ 创建子类型实例时无法向父类型的构造函数传参
+
+** 一**  
+我们先来看第一个
+在原型链继承方案中，我们的原型会变成另一个类型的实例，如下数代码， Solder.prototype 变成了 Person 的一个实例，所以 Person的实例属性 hobbies 就变成了 Solder 的属性。
+
+在原型属性上的引用类型数据会被所有的实例共享，每个实例都能对其进行修改，所以多个实例对引用类型的操作会篡改原数据，如下 我们修改了 s1 实例中的实例属性后，影响到了 s2 中实例属性的值。
+```
+function Person() {
+    this.hobbies = ['football', 'basketball', 'swimming'];
+}
+
+Person.prototype.run = function () {
+    console.log(this.name + ' is running!');
+}
+
+function Solder() {
+
+}
+
+
+Solder.prototype = new Person()
+var s1 = new Solder()
+var s2 = new Solder()
+console.log(s1.hobbies, s2.hobbies);
+s1.hobbies.shift()
+console.log(s1.hobbies, s2.hobbies);
+```
+
+** 二**  
+首先看下面代码
+```
+function Person() {
+    this.hobbies = ['football', 'basketball', 'swimming'];
+}
+
+Person.prototype.run = function () {
+    console.log(this.name + ' is running!');
+}
+
+function Solder() {
+
+}
+
+
+Solder.prototype = new Person()
+var p = new Solder()
+console.log(p.constructor);
+
+/
+*ƒ Person() {
+    this.hobbies = ['football', 'basketball', 'swimming'];
+}
+*/
+```
+观察打印结果 我们发现通过 new Solder() 出的实例的构造函数，不是 Solder 而是 Person
+因为这个 Solder 的 原型对象指向的是 Person 的实例 这个实例的构造函数 constructor 是 Person
+解决方法就是 重写 我们这个 Solder 的 constructor 让他指向 Solder
+```
+function Person() {
+    this.hobbies = ['football', 'basketball', 'swimming'];
+}
+
+Person.prototype.run = function () {
+    console.log(this.name + ' is running!');
+}
+
+function Solder() {
+
+}
+
+
+Solder.prototype = new Person()
+Solder.prototype.constructor = Solder;  // 新增代码 将 Solder 原型对象的 constructor 指向自己的构造函数 Solder
+var p = new Solder()
+console.log(p.constructor);
+/*
+ƒ Solder() {
+
+}
+*/
+```
+
+** 三**  
+给子类型原型添加属性和方法要在替换原型之后，因为我们会替换子类型的原型 替换之后指向了 Person 的 实例。
+```
+function Person() {
+    this.hobbies = ['football', 'basketball', 'swimming'];
+}
+
+Person.prototype.say = function () {
+    return this.hobbies.join(' ') // 修改方法
+}
+
+function Solder() {
+
+}
+
+
+Solder.prototype = new Person()
+Solder.prototype.constructor = Solder;
+
+Solder.prototype.say = function () {
+    return this.hobbies.join(','); // 新增方法
+}
+
+var p = new Solder()
+console.log(p.say());
+```
+我们会发现，现在实例能访问两个 say 方法 ，但是 实际上运行的是我们新增在 Solder 原型对象上的 say 方法 而 Person.prototype 上也有一个 say 方法，但是它不会访问到。这种情况称为 属性遮蔽。
+如果我们要访问 Person 上的 say 方法要如何操作？ 通过 __proto__  // console.log(p.__proto__.__proto__.say);
+
+#### 其他继承方案
+由于 ES6 封装了 class 日常工作中我们使用 ES6 Class Extends (模拟原型)继承方案即可，更多可阅读 木易杨大神的 [Javascript 8种继承方案](https://github.com/yygmind/blog/issues/7)
+
+
+#### 练习：
+有三个判断数组的方法，请分别介绍他们之间的区别和优劣
++ Object.prototype.toString.call()
++ instanceOf
++ Array.isArray()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#### 小结
++ 每个对象拥有一个原型对象，通过 __proto__ 指向上一个原型，并从中继承方法和属性，同时原型对象也可能拥有原型，这样一层一层，最终指向 null，这种关系被称为 **原型链**  
++ 当访问一个对象的属性或方法时，它不止在对象本身查找，还会查找该对象的原型，如果对象的原型也有原型，还会再该对象的原型的原型，一层一层，向上查找，直到找到名称完全匹配的属性或方法，或到达原型链的顶层 null 。
++ 原型链的构建依赖于 __proto__,一层一层最终链接到null。
++ instanceOf 的原理就是一层一层查找 __proto__，如果和 constructor.prototype 相等则返回 true ，如果一直没有查找成功，则返回 false
++ 原型链继承的本质就是重写原型对象，用一个新类型的实例来代替。
 
 
 
