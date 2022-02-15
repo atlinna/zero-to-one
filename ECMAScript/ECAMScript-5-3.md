@@ -213,6 +213,94 @@ var teacher = {
 var s = Object.create(teacher)
 console.log(s);
 ```
+**优化 new 的实现**  
+正如上面介绍的不建议使用 __proto__ 修改原型，所以我们使用 Object.create() 来实现
+我们只需要把之前 链接原型 和创建空对象 放在一起进行 使对象直接继承我们构造函数的原型。
+如下：
+```
+	function myNEW() {
+	    var handler = Array.prototype.shift.call(arguments);
+	    var obj = Object.create(handler.prototype);
+	    var ret = handler.apply(obj, arguments)
+	    return ret instanceof Object ? ret : obj
+	}
+```
+
+#### 原型链
+每个对象都拥有一个原型对象，通过 __proto__ 指向上一个原型，并从中继承方法和属性， 同时原型对象也可能拥有原型，这样一层一层，最终指向 null。这种关系被称为原型链（prototype chain），
+通过原型链，一个对象会拥有定义在其他对象中的属性和方法。
+```
+function Person(name) {
+    this.name = name;
+}
+
+var p = new Person('zhang san');
+
+console.log(p.constructor === Person); // true
+```
+这段代码打印出的结果是 true 是意味着 实例中存在 constructor 属性指向构造函数吗？
+当然不是 我们之前打印除了 实例的结构 发现  实例 p 本身没有 constructor，是通过原型链向上查找 __proto__，最终找到 constructor 属性，该属性指向 Person。
+于是 我们的原型链 如下：
+```
+function Person(name) {
+    this.name = name;
+}
+
+var p = new Person('zhang san');
+
+console.log(p.__proto__ === Person.prototype);
+console.log(p.__proto__.__proto__ === Object.prototype);
+console.log(p.__proto__.__proto__.__proto__ === null);
+```
+__proto__属性指向的是上一个原型，也就是说 我们一直在取上一个原型，只要我们的取出来的不是null （最顶层的原型）
+
+#### 小结
++ Symbol 作为构造函数来说并不完整，因为不支持语法 new Symbol()，但其原型上拥有 constructor 属性，即 Symbol.prototype.constructor。
++ 引用类型 constructor 属性值是可以修改的， 但是对于基本类型来说是只读的， null 和 undefined 没有 constructor 属性。
++ __proto__ 是每个实例上都有的属性， prototype 是构造函数的属性，这两个并不一样，但 p.__proto__ 和 Person.prototype 指向同一个对象。
++ __proto__ 属性在 ES6 时被标准化，但因为性能问题并不推荐使用，推荐使用Object.getPrototypeOf（）
++ 每个对象拥有一个原型对象，通过 __proto__ 指针指向上一个原型，并从中继承方法和属性，同时原型对象也可能拥有原型，这样一层一层，最终指向null，这就是原型链。 
+
+- - -
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
