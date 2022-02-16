@@ -534,6 +534,157 @@ console.log(p.say());
 + instanceOf 的原理就是一层一层查找 __proto__，如果和 constructor.prototype 相等则返回 true ，如果一直没有查找成功，则返回 false
 + 原型链继承的本质就是重写原型对象，用一个新类型的实例来代替。
 
+### 深入探究 Function & Object 鸡蛋问题
+上一部分在介绍原型链继承的过程中，给大家描述了原型链运作机制以及属性遮蔽等知识，这一节我们就来探究下 Function.__proto__  === Function.prototype 引起的鸡生蛋，蛋生鸡问题，并在这个过程中深入了解 Object.prototype、Function.prototype、function Object、function Function 之间的关系。
+
+我们可以先来看看 ECMAScript 上的定义。
+```
+	The value of the [[Prototype]] internal property of the Object prototype object is null, the value of the [[Class]] internal property is "Object", and the initial value of the [[Extensible]] internal property is true.
+	
+	Object原型对象的【[Prototype】]内部属性的值为null,[[Class]]内部属性的值为"Object",[[可扩展]]内部属性的初始值为true。
+```
+Object.prototype 表示 Object 的原型对象，其 [[Prototype]] 属性值是 null ，访问器属性 __proto__ 暴露了一个对象的内部 [[Prototype]]。 Object.prototype 并不是通过 Object 函数创建的，为什么呢？ 看如下代码
+```
+function Person() {
+    this.val = 'person'
+}
+
+var person1 = new Person();
+person1.__proto__ = Person.prototype;
+```
+	实例对象的 __proto__ 指向 构造函数的 prototype 即 person1.__proto___ = Person.prototype,但是 Object.prototype.__proto__ = null 所以 Object.prototype 并不是通过 Object 函数创建的，那他是如何生成的？ 其实 Object.prototype 是浏览器底层根据 ECMAScript 规范创造的一个对象。
+	Object.prototype 就是原型链的顶端 （不考虑 null），所有对象纪恒了它的 toString 等方法和属性。
+
+
+#### Function.prototype
+首先来看下 ECMAScript 上的定义：
+```
+	The Function prototype object is itself a Function object (its [[Class]] is "Function").
+
+	The value of the [[Prototype]] internal property of the Function prototype object is the standard built-in Object prototype object.
+
+	The Function prototype object does not have a valueOf property of its own; however, it inherits the valueOf property from the Object prototype Object.
+```
+	Function.prototype 对象是一个函数（对象），其[[Prototype]] 内部属性值指向内建对象 Object.prototype. Function.prototype 对象自身没有 valueOf 属性，其从 Object.prototype 对象继承了 valueOf 属性。
+
+	Function.prototype 的 [[Class]] 属性是 Function，所以这是一个函数，但又不大一样。为什么这么说呢？因为我们直到只有函数才有 prototype 属性，但并不是所有函数都有这个属性，因为 Function.prototype 这个函数就没有。
+```
+	console.log(Function.prototype) // f(){[native code]}
+	console.log(Function.prototype.prototype);  // undefined
+```
+为什么 会没有 prototype 呢？
+Function.prototype 是引擎创建出来的函数，引擎认为不需要给这个函数对象添加 prototype 属性，不然 Function.prototype.prototype... 将无休无止并且没有意义。
+
+#### function Object
+先来看 ECMAScript 的定义
+```
+	The value of the [[Prototype]] internal property of the Object constructor is the standard built-in Function prototype object.
+```
+Object 作为构造函数时，其 [[Prototype]] 内部属性值指向 Function.prototype, 即
+```
+ 	Object.__proto__ = Function.prototype
+```
+使用 new Object() 创建新对象时，这个新对象的 [[Prototype]] 内部属性指向构造函数的 prototype 属性，即 Object.prototype 属性，对应 Object.prototype
+
+也可以通过对象字面量等方式创建对象。
++ 使用对象字面量创建的对象，其 [[Prototype]] 值是 Object.prototype。
++ 使用数组字面量创建的对象，其 [[Prototype]] 值是 Array.prototype。
++ 使用 function f(){} 函数创建的对象， 其 [[Prototype]] 值是 Function.prototype。
++ 使用 new fun() 创建的对象，其中 fun 是由 Javascript 提供的内建构造器函数之一 (Object, Function, Array, Boolean, Date, Number, String 等等)，其 [[Prototype]] 值是 fun.prototype
++ 使用其他 Javascript 构造器函数创建的对象，其 [[Prototype]] 值就是该构造器函数的 prototype 属性。
+```
+// 1 -- 对象字面量方式
+var obj = { name: 'zhang san' }
+console.log(obj.__proto__ === Object.prototype); // true obj -- > Object.prototype --> null
+
+
+// 2 -- 数组字面量方式
+var arr = ['zhangsan', 'lisi', 'wangwu'];
+console.log(arr.__proto__ === Array.prototype); // true
+console.log(arr.__proto__.__proto__ === Object.prototype); // true  arr --> Array.prototype --> Object.prototype --> null
+
+
+// 3 -- function f(){} 方式
+function f() {
+    return 's'
+}
+console.log(f.__proto__ === Function.prototype); // true
+console.log(f.__proto__.__proto__ === Object.prototype); // true f --> Function.prototype --> Object.prototype --> null
+
+
+// 4 -- new Function() 方式
+var fun = new Function()
+console.log(fun.__proto__ === Function.prototype); // true
+console.log(fun.__proto__.__proto__ === Object.prototype); // true fun --> Function.prototype --> Object.prototype --> null
+
+
+var ob = new Object() // ob --> Object.prototype --> null
+
+
+// 5 -- 其他构造器函数
+function Person() {
+    return {}
+}
+var p = new Person()
+console.log(p.__proto__ === Person.prototype); // false
+console.log(p.__proto__ === Object.prototype); // true  p --> Object.prototype --> null
+```
+
+#### function Function
+定义
+```
+The Function constructor is itself a Function object and its [[Class]] is "Function". The value of the [[Prototype]] internal property of the Function constructor is the standard built-in Function prototype object.
+```
+Fcuntion 构造函数是一个函数对象，其 [[Class]] 属性是 Function。Function 的 [[Prototype]] 属性指向了 Function.prototype ,即
+```
+Function.__proto__ === Function.prototype
+```
+哦吼？ 是不是有点意思了。
+
+#### Function & Object 鸡蛋问题
+ok 我们先看下面的代码
+```
+Object instanceof Function  // true
+Function instanceof Object  // true
+
+Object instanceof Object    // true
+Function instanceof Function    // true
+```
+Object 构造函数继承了 Function.prototype，同时 Function 构造函数继承了 Object.prototype。这里就产生了**鸡和蛋**的问题。 为什么会出现这种问题，因为 Function.prototype 和 Function.__proto__ 都指向 Function.prototype。
+```
+console.log(Object.__proto__ === Function.prototype); // true
+console.log(Object.__proto__.__proto__ === Object.prototype); // true
+
+console.log(Function.__proto__.__proto__ === Object.prototype); // true
+console.log(Function.__proto__ === Function.prototype); // true
+```
+而对于 Function.__proto__ === Function.prototype 这一现象有两种解释，争论点就在于 Function 对象是不是由 Function 构造函数创建的一个实例？
+
+**解释1、YES:**
+根据 Javascript 中对实例的定义， a 是 b 的实例，即 a instanceof b 为 true，默认判断条件就是 b.prototype 在 a 的原型链上。而 Function instanceof Function 为 true，本质上即 Object.getPrototypeOf(Function) === Function.prototype, 符合定义
+
+**解释2、NO:**  
+Function 是 built-in 的对象（内置对象），也就是说并不存在 Function 对象由 Function 构造函数创建，这样显然会造成**鸡蛋问题**。实际上，当你直接写一个函数是（如 function f(){} 或 x => x),也不存在调用 Function 构造器，只有在显示调用 Function 构造器时 （如 new Function('x','return x')） 才有。
+
+个人比较偏向第二种吧，现有 Function.prototype 然后有的 function Function (){}, 所以就不存在**鸡蛋问题**，把 Function.__proto__ 指向 Function.prototype 是为了保证原型链的完整， 让 Function 可以获取定义在 Object.prototype 上的方法。
+
+[上图](https://camo.githubusercontent.com/f6885e99add627deab51b5533d4ae52b0755d8b3d0d71b8e27533ccaa821f084/68747470733a2f2f7773322e73696e61696d672e636e2f6c617267652f303036744e6337396779316732336e3436757a6a616a33306836306c703076372e6a7067)
+
+
+#### 内置类型构建过程
+Javascript 内置类型是浏览器内核自带的，浏览器底层对 Javascript 的实现基于 C/C++，那么浏览器在初始化 Javascript 环境时发生了什么？
++ 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
