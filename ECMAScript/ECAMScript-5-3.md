@@ -673,7 +673,16 @@ Function 是 built-in 的对象（内置对象），也就是说并不存在 Fun
 
 #### 内置类型构建过程
 Javascript 内置类型是浏览器内核自带的，浏览器底层对 Javascript 的实现基于 C/C++，那么浏览器在初始化 Javascript 环境时发生了什么？
-+ 
++ 用 C/C++ 构建内部数据结构创建一个 OP （Object.prototype）以及初始化其内部属性但不包括行为。
++ 用 C/C++ 构建内部数据结构创建一个 FP （Function.prototype） 以及初始化其内部属性但不包括行为。
++ 将 FP 的 [[Prototype]] 指向 OP。
++ 用 C/C++ 构造内部数据结构创建各种内置引用类型。
++ 将各个内置引用类型的 [[Prototype]] 指向 FP。
++ 将 Function 的 prototype 指向 FP
++ 将 Object 的 prototype 指向 OP
++ 用 Function 实例化出 OP，FP，以及 Object 的行为并挂载。
++ 实例化内置对象 Math 和 Global
+至此，所有内置类型构建完成。
 
 
 
