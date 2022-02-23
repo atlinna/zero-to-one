@@ -328,8 +328,54 @@ var func = name.binds(ob1)
 func()
 ```
 
+**参数复用**  
+我们知道调用 toString() 可以获取每个对象的类型，但是不同对象的 toString() 有不同的实现，所以需要通过 Object.prototype.toString() 来获取 Object 上的实现， 同时以 call / apply 的形式来调用，并传递要检查的对象作为第一个参数。
+如下：
+```
+function isArray(params) {
+  return Object.prototype.toString.call(params) === '[object Array]'
+}
+
+console.log(isArray([1, 2]));
+console.log(isArray({}));
+console.log(isArray(1));
+```
+但是这样会存在一个问题，**不够灵活**，假如说我们现在要检查很多类型，那我们每个类型都要去定义一个方法去判断吗？
+那肯定是不行的，所以我们就来换一种方式
+```
+var getType = Function.prototype.call.bind(Object.prototype.toString)
+
+console.log(getType([1, 2]));
+```
+这里我们使用 bind 来扩展，优点是可以直接使用改造后的函数
+使用 Function.prototype.call 函数指定一个 this 值，然后 .bind 返回一个新的函数，始终将 Object.prototype.toString 设置为传入参数，其实等价于 Object.prototype.toString.call()。
+
+**实现currying函数**  
+开始我们用简单的方式粗略的实现了一个 currying 函数，接下来我们完善以下 currying 将他封装的更加健壮
+首先我们知道柯里化函数的实质就是**通过闭包收集参数，并将参数集中起来处理，最后返回我们需要的结果**。
+那么我们 currying 函数的原理就是通过闭包搜集参数，当参数足够时执行传入函数。
+```
+function currying(fn, length) {
+  length = length || fn.length   // 获取参数的长度
+  return function (...args) {
+    return args.length >= length ?
+      fn.apply(this, args) : currying(fn.bind(this, ...args), length - args.length)
+  }
+}
 
 
+var func = currying(function (a, b, c) {
+  console.log([a, b, c]);
+})
+
+// func('a', 'b', 'c')
+// func('a', 'b')('c')
+// func('a')('c')('b')
+```
+currying 函数其实就是判断参数个数是否符合要求，如果够了，就会立即执行函数。那么注意这里  如果参数够了，但是你的注入的参数超过需要的参数数量，则会报错。
+```
+func('a')('c')('b')('d')
+```
 
 
 
