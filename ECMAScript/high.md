@@ -377,6 +377,76 @@ currying 函数其实就是判断参数个数是否符合要求，如果够了�
 func('a')('c')('b')('d')
 ```
 
+**扩展：函数的length**
+在我们实现 currying 的过程中，我们用到了 fn.length 有的小伙伴就会说了 函数的 length 是我们传入所有参数的 length 吗， 其实并不是这样的
+函数的 length 属性获取的确实是参数的个数，但是并不是入参的个数，而是定义函数时的形参个数，但是形参的个数不包括剩余参数的个数，且仅包括第一个具有默认值之前的参数个数
+```
+console.log((function (a, b, c) { }).length); // 3
+console.log((function (a, b, c = 2) { }).length); // 2
+console.log((function (a, b = 2, c) { }).length); // 1
+console.log((function (a = 2, b, c) { }).length); // 0
+function test(...args) { console.log(args.length); }
+test(1, 2, 3)  // 3
+```
+所以在**柯里化函数中，不建议使用 ES6 的参数默认值**
+
+
+### Array 原型方法
+下面给大家整理一些 Array 上常用的数组方法的实现。
+**1、Array.prototype.map：**
+完整的结构是 Array.prototype.map(callback,this_args), map 函数接收两个参数，一个是必须的回调函数，另一个是在执行 callback 函数时的 this 的值
+map 方法的主要功能是把原数组中每个元素按顺序执行一次 callback 函数，并且把所有返回的结果组合成一个新的数组，map 的返回值就是这个数组
+```
+Array.prototype.newMap = function (callback, this_args) {
+  // 异常处理
+  if (this == null) {
+    throw new TypeError('Cannot read property "map" of null or undefined');
+  }
+  let O = Object(this); // 1、转成数组对象，有 length 属性和 k-v 键值对
+  let len = O.length >>> 0; // 2、无符号右移 0 位，左侧填 0 补充，结果非负
+  // 3、判断 callback 是否为函数
+  if (typeof callback !== 'function') {
+    throw new TypeError(callback + ' is not a function');
+  }
+
+  let T = this_args; // 4、保存传入的 this
+  let A = new Array(len); // 5、创建一个新数组 长度为 len 默认为 空
+  let k = 0; // 6、 变量 k 为遍历索引
+  while (k < len) {
+    // 7、检查 k ： 是否在 O 及 O 的原型链上包含属性 k
+    if (k in O) {
+      let val = O[k]; // 8、获取遍历项 item
+      let mapedVal = callback.call(T, val, k, O); // 9、执行函数 callback 并传入参数 遍历项 、索引、数组本身
+      A[k] = mapedVal; // 10、取得返回值 并对新数组赋值
+    }
+    k++;
+  }
+  return A;
+}
+
+
+let arr = [1, 2, 3]
+let brr = arr.newMap((item, index) => {
+  return item * 2
+})
+
+console.log(brr);
+```
+map 实现的核心在于不会关注我们回调函数的逻辑，而是通过遍历执行回调函数（传入 遍历项、索引、数组本身）拿到返回结果并赋值给新数组。
+只有 O 及其原型链上包含属性 k 时才会执行 callback 函数，所以对于稀疏数组 empty 元素 或者使用 delete 删除后的索引则不会调用。
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
