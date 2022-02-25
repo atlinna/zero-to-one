@@ -505,6 +505,38 @@ Array.prototype.myReduce = function (callback, initialVal) {
 首先还是定义循环变量 k ，紧接着定义了一个 accumulator 变量，这个是我们要返回的结果，继续往下  我们曾经说过有无初始值 initialVal 的两种情况，当 initialVal 不存在的时候会先定义一个标记值，
 如果这个标记值为 false 的时候会从0开始遍历 判断 k 值 是否是 O 及 O 的原型链上的属性，是的话就将 O[k] 的值赋值给 accumulator ，然后 k + 1
 
+**Array.prototype.forEach**
+forEach 方法和 map 极其相似，只不过 map 是有返回值的，但是 forEach 是没有返回值的
+```
+Array.prototype.myForEach = function (callback, this_args) {
+  if (this == null) {
+    throw new TypeError('Cannot read property "forEach" of null or undefined');
+  }
+  if (typeof callback !== 'function') {
+    throw new TypeError(callback + ' is not a function')
+  }
+  let O = Object(this);
+  let len = this.length >>> 0;
+  let _this = this_args;
+
+  let k = 0;
+  while (k < len) {
+    if (k in O) {
+      let kVal = O[k];
+      callback.call(_this, kVal, k, O);
+    }
+    k++;
+  }
+}
+
+let arr = [1, 2, 3, 4, 5, 6]
+let brr = [];
+arr.myForEach(function (item, index) {
+  this[index] = item * index
+}, brr)
+console.log(brr);
+```
+
 
 
 
