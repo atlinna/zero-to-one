@@ -435,9 +435,75 @@ console.log(brr);
 map 实现的核心在于不会关注我们回调函数的逻辑，而是通过遍历执行回调函数（传入 遍历项、索引、数组本身）拿到返回结果并赋值给新数组。
 只有 O 及其原型链上包含属性 k 时才会执行 callback 函数，所以对于稀疏数组 empty 元素 或者使用 delete 删除后的索引则不会调用。
 
+**Array.prototype.reduce**  
+reduce 的作用就是 将数据处理为单个返回值，如同河流汇聚，变为大海。 reduce 的完整结构是 Array.prototype.reduce(callback,initialVal), 在这里第二个参数就不是 this 了，而是初始值 initialVal，关于初始值，我们在使用的时候介绍过。
++ 如果我们没有初始的 initialVal，那么第一次调用 callback 函数时，prev 使用原数组的第一个元素，那么 item 就是数组中的第二个元素
++ 如果设置了初始值 initialVal，那么首次运行时第一次 prev 的值是 initialVal ，item 是数组中的第一个元素。
++ 如果没有设置初始值并且数组为空 那么 reduce 将报错。
+接下来我们来模拟实现一个reduce：
+```
+Array.prototype.myReduce = function (callback, initialVal) {
+  if (this == null) {
+    throw new TypeError('')
+  }
+  let O = Object(this);
+  let len = this.length >>> 0;
+
+  if (typeof callback !== 'function') {
+    throw new TypeError(callback + ' is not a function')
+  }
+  if (initialVal && len == 0) {
+    throw new TypeError('error')
+  }
 
 
+  let k = 0;
+  let accumulator = null;
+  if (initialVal) {
+    accumulator = initialVal;
+  } else {
+    let kpresent = false
+    while (!kpresent && k < len) {
+      kpresent = k in O
+      if (kpresent) {
+        accumulator = O[k]
+      }
+      k++;
+    }
+  }
 
+  while (k < len) {
+    if (k in O) {
+      let keyVal = O[k];
+      let ret = callback(accumulator, keyVal, k, O);
+      accumulator = ret
+    }
+    k++;
+  }
+
+  return accumulator;
+}
+```
+大部分逻辑和 map 都是差不多的哈，只不过 map 返回的是数组，而 reduce 返回的是 accumulator 是 经由 reduce 处理之后的单个结果。
+这里来说一下这部分代码，如下：
+```
+  let k = 0;
+  let accumulator = null;
+  if (initialVal) {
+    accumulator = initialVal;
+  } else {
+    let kpresent = false
+    while (!kpresent && k < len) {
+      kpresent = k in O
+      if (kpresent) {
+        accumulator = O[k]
+      }
+      k++;
+    }
+  }
+```
+首先还是定义循环变量 k ，紧接着定义了一个 accumulator 变量，这个是我们要返回的结果，继续往下  我们曾经说过有无初始值 initialVal 的两种情况，当 initialVal 不存在的时候会先定义一个标记值，
+如果这个标记值为 false 的时候会从0开始遍历 判断 k 值 是否是 O 及 O 的原型链上的属性，是的话就将 O[k] 的值赋值给 accumulator ，然后 k + 1
 
 
 
