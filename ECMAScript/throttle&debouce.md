@@ -57,8 +57,66 @@ let so = throttle(function () {
 上面我们介绍了节流，这次我们来认识一下防抖。
 **防抖函数 debounce 指的是某个函数在某段时间内，无论触发多少次，都只执行最后一个回调。**假设我们有一个搜索框，我们监听了搜索框的输入事件，这样只要开始输入就会我们就会去发送接口查询内容对吧？ 但是如果我连续的输入很多字符那么这个接口是不是和我们输入的字符相关，有多少字符就会调用多少次接口，这样加大了我们服务器的压力。如果我们设置一个时间为1s的计时器，在 1s 内如果还会调用这个函数，就清除定时器重新计时，否则当定时器计时完毕运行回调函数，方法执行。
 
+```
+function debounce(fn, wait) {
+  let timer = null
+  return function () {
+    if (timer) clearTimeout(timer)
+
+    timer = setTimeout(() => {
+      fn.apply(this, Array.prototype.slice.call(arguments))
+    }, wait)
+  }
+}
+
+var f = debounce(function () {
+  console.log(123);
+}, 1000)
 
 
+var count = 0;
+var t = setInterval(function () {
+  count += 1
+  if (count > 11) {
+    clearInterval(t)
+  } else {
+    f()
+  }
+}, 800)
+```
+如果想要第一次出发回调事件，需要改写一下 debounce 函数，加上第一次触发立即执行的功能。
+```
+function debounce(fn, wait, immediate) {
+  let timer = null
+  return function () {
+    let args = Array.prototype.slice.call(arguments);
+    if (timer) clearTimeout(timer);
+    if (immediate && !timer) {
+      fn.apply(this, args);
+    }
+
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, wait)
+  }
+}
+
+var f = debounce(function () {
+  console.log(123);
+}, 1000, true)
+
+
+var count = 0;
+var t = setInterval(function () {
+  count += 1
+  if (count > 11) {
+    clearInterval(t)
+  } else {
+    f()
+  }
+}, 800)
+```
+[underscore - debounce](https://github.com/yygmind/blog/issues/39)
 
 
 
