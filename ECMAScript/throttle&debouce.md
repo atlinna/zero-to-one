@@ -22,11 +22,40 @@ s: 秒
 
 这里我们通过第一种方式实现 throttle 
 ```
+/**
+ * 
+ * @param {可执行的回调函数} callback 
+ * @param {时间间隔} wait 
+ */
 
+function throttle(callback, wait) {
+  let previous = 0;
+  return function (...args) {
+    let now = + new Date()
+    if (now - previous > wait) {
+      previous = now
+      callback.apply(this, args)
+    }
+  }
+}
+
+
+let so = throttle(function () {
+  console.log(1)
+}, 1000)
+
+// setInterval(so, 100)
 ```
 
+**underscore 源码**  
+[underscore - 源码](https://github.com/yygmind/blog/issues/38)
 
 
+
+
+### 防抖 - debounce
+上面我们介绍了节流，这次我们来认识一下防抖。
+**防抖函数 debounce 指的是某个函数在某段时间内，无论触发多少次，都只执行最后一个回调。**假设我们有一个搜索框，我们监听了搜索框的输入事件，这样只要开始输入就会我们就会去发送接口查询内容对吧？ 但是如果我连续的输入很多字符那么这个接口是不是和我们输入的字符相关，有多少字符就会调用多少次接口，这样加大了我们服务器的压力。如果我们设置一个时间为1s的计时器，在 1s 内如果还会调用这个函数，就清除定时器重新计时，否则当定时器计时完毕运行回调函数，方法执行。
 
 
 
