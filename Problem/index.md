@@ -25,3 +25,4 @@
 + [堆结构](/Problem/Heapq.md)
 + [指针](/Problem/Point.md)
 + [位运算](/Problem/Bitwise.md)
++ [二分法](/Problem/dichotomy.md)
