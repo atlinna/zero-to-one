@@ -26,3 +26,4 @@
 + [指针](/Problem/Point.md)
 + [位运算](/Problem/Bitwise.md)
 + [二分法](/Problem/dichotomy.md)
++ [数独问题](/Problem/Sudoku.md)
