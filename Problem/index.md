@@ -27,3 +27,4 @@
 + [位运算](/Problem/Bitwise.md)
 + [二分法](/Problem/dichotomy.md)
 + [数独问题](/Problem/Sudoku.md)
++ [39. 组合总和](/Problem/backtracking.md)
