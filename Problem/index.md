@@ -19,12 +19,12 @@
 铺好了路，PC端，移动端，App，小程序。试问 谁行啊？ 但是我们也不要闭门造车， 如果有空一定要多学一点，增加自身的知识储备，很多东西不是你
 一两天能看懂的，但是没准能在邻居家弄懂啊 对吧 ^_^!
 
-+ [链表类](/Problem/ListNode.md)
-+ [辅助栈类](/Problem/Stack.md)
-+ [动态规划](/Problem/Dynamic_Programming.md)
-+ [堆结构](/Problem/Heapq.md)
-+ [指针](/Problem/Point.md)
-+ [位运算](/Problem/Bitwise.md)
-+ [二分法](/Problem/dichotomy.md)
-+ [数独问题](/Problem/Sudoku.md)
-+ [回溯](/Problem/backtracking.md)
++ [链表类](zero-to-one/Problem/ListNode.md)
++ [辅助栈类](zero-to-one/Problem/Stack.md)
++ [动态规划](zero-to-one/Problem/Dynamic_Programming.md)
++ [堆结构](zero-to-one/Problem/Heapq.md)
++ [指针](zero-to-one/Problem/Point.md)
++ [位运算](zero-to-one/Problem/Bitwise.md)
++ [二分法](zero-to-one/Problem/dichotomy.md)
++ [数独问题](zero-to-one/Problem/Sudoku.md)
++ [回溯](zero-to-one/Problem/backtracking.md)
