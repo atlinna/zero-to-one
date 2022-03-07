@@ -28,3 +28,4 @@
 + [二分法](/Problem/dichotomy.md)
 + [数独问题](/Problem/Sudoku.md)
 + [回溯](/Problem/backtracking.md)
++ [全排列](/Problem/full_arrangement.md)
