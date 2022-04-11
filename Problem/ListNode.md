@@ -1,6 +1,26 @@
 # 链表
 ---
+**双向链表**
+双向链表的优点：
+
++ 无论给出哪一个节点，都能对整个链表进行遍历
+
+缺点：
+
++ 多耗费一个引用的空间，而且构建双向链表比较复杂
+
+```
+function Node(value, next, pre) {
+  this.value = value;
+  this.next = next;
+  this.pre = pre;
+}
+```
+
+
+
 ### 一个文档
+
 可以看下 Leet-Book 对链表的介绍，这里就不给各位老板科普了，需要的自行百度。
 https://leetcode-cn.com/leetbook/read/linked-list/x6ybqh/
 
