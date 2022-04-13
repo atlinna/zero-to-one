@@ -6,6 +6,7 @@
 + [对象继承方案](/ECMAScript/ObjExtends.md)
 + [Javascript - 高阶函数](/ECMAScript/high.md)
 + [防抖 & 节流](/ECMAScript/throttle&debouce.md)
++ [ES6-8](/ES6-top/index.md)
 + [ECMAScript - 6](/ECMAScript/ECMAScript-6.md)
 + [算法提升 - （Python版）](/Problem/index.md)
 + [前端100问](https://github.com/yygmind/blog/issues/43)
