@@ -25,7 +25,7 @@
 
 5、重复 2-4 过程，直到所有的点都连通为止。
 
-![最小生成树图](/Users/lucasy/workspace/new_level/note/Problem/picture/最小生成树-图.png)
+![最小生成树图](/Problem/picture/最小生成树-图.png)
 
 ```
 /**
