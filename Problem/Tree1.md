@@ -220,3 +220,85 @@ function kruskal(pointSet, distance) {
 
 console.log(kruskal(pointSet, distance));
 ```
+添加注释并优化循环次数：
+```
+function getIndex(allPointSet, target) {
+    for (let i = 0; i < allPointSet.length; i++) {
+        if (allPointSet[i].value == target.value) {
+            return i
+        }
+    }
+    return -1
+}
+
+function midWare(allPointSet, temp_begin, temp_end) { // 中间处理函数，拿到节点对应的部落，起点对应的部落 与 终点对应的部落
+    let beginIn = null;
+    let beginEnd = null;
+    for (let i = 0; i < allPointSet.length; i++) {
+        if (getIndex(allPointSet[i], temp_begin) > -1) {
+            beginIn = allPointSet[i]
+        }
+        if (getIndex(allPointSet[i], temp_end) > -1) {
+            beginEnd = allPointSet[i]
+        }
+    }
+    return [beginIn, beginEnd] // 找到 节点对应的部落
+}
+
+function canLink(beginIn, beginEnd) {
+    if (beginIn && beginEnd && beginIn == beginEnd) { // 如果 beginIn 与 beginEnd 相等，则部落相等，那么同一个部落一定是已经相连过的点 返回 false
+        return false
+    }
+    return true
+}
+
+function link(allPointSet, beginIn, beginEnd, begin, end) {
+    if (!beginIn && !beginEnd) { // 都没有部落，则新增一个部落
+        allPointSet.push([begin, end])
+    } else if (!beginIn && beginEnd) { // 起点没有部落， 终点存在部落，意味着终点的部落要新增一个成员 -- 起点
+        beginEnd.push(begin)
+    } else if (!beginEnd && beginIn) { // 终点没有部落，起点存在部落，意味着起点的部落要新增一个成员 -- 终点
+        beginIn.push(end)
+    } else if (beginIn && beginEnd && beginIn != beginEnd) { // 两点都存在部落，但是部落是不同的，那么就连同两个部落，为一个大部落
+        beginIn.concat(beginEnd)
+        allPointSet.splice(allPointSet.indexOf(beginEnd), 1)
+    }
+}
+
+function kruskal(pointSet, distance) {
+    let allPointSet = []
+    while (true) {
+        let begin = null
+        let end = null
+        let minDis = m
+        let mid_begin = null
+        let mid_end = null
+        for (let i = 0; i < distance.length; i++) {
+            for (let j = 0; j < i; j++) { // 为什么是 i 次 因为 我们的 distance 关系表 中斜线对称，只需要遍历一边就可以了
+                if (i != j && distance[i][j] < minDis) {
+                    let temp_begin = pointSet[i]
+                    let temp_end = pointSet[j]
+                    let mid = midWare(allPointSet, temp_begin, temp_end)
+                    if (canLink(mid[0], mid[1])) {
+                        begin = temp_begin
+                        end = temp_end
+                        minDis = distance[i][j]
+                        mid_begin = mid[0]
+                        mid_end = mid[1]
+                    }
+
+                }
+            }
+        }
+        begin.neighbor.push(end)
+        end.neighbor.push(begin)
+        link(allPointSet, mid_begin, mid_end, begin, end)
+        if (allPointSet.length == 1 && allPointSet[0].length == pointSet.length) {
+            break
+        }
+    }
+    return allPointSet[0]
+}
+
+console.log(kruskal(pointSet, distance));
+```
