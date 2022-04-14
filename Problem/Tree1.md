@@ -116,3 +116,107 @@ console.log(prim(pointSet, distance, A))
 
 4、重复 1-3 直到所有的点都连接到一起。
 
+```
+
+function Node(value) {
+    this.value = value;
+    this.neighbor = []
+}
+
+let m = Infinity
+let distance = [
+    [0, 4, 7, 6, m],
+    [4, 0, m, m, m],
+    [7, m, 0, 8, 10],
+    [6, m, 8, 0, m],
+    [m, m, 10, m, 0],
+]
+
+let A = new Node('A')
+let B = new Node('B')
+let C = new Node('C')
+let D = new Node('D')
+let E = new Node('E')
+let pointSet = [A, B, C, D, E]
+
+function getIndex(allPointSet, target) {
+    for (let i = 0; i < allPointSet.length; i++) {
+        if (allPointSet[i].value == target.value) {
+            return i
+        }
+    }
+    return -1
+}
+
+function canLink(allPointSet, temp_begin, temp_end) {
+    let beginIn = null;
+    let beginEnd = null;
+    for (let i = 0; i < allPointSet.length; i++) {
+        if (getIndex(allPointSet[i], temp_begin) > -1) {
+            beginIn = allPointSet[i]
+        }
+        if (getIndex(allPointSet[i], temp_end) > -1) {
+            beginEnd = allPointSet[i]
+        }
+    }
+
+    if (beginIn && beginEnd && beginIn == beginEnd) {
+        return false
+    }
+    return true
+}
+
+function link(allPointSet, begin, end) {
+    let beginIn = null;
+    let beginEnd = null;
+    for (let i = 0; i < allPointSet.length; i++) {
+        if (getIndex(allPointSet[i], begin) > -1) {
+            beginIn = allPointSet[i]
+        }
+        if (getIndex(allPointSet[i], end) > -1) {
+            beginEnd = allPointSet[i]
+        }
+    }
+
+    if (!beginIn && !beginEnd) {
+        allPointSet.push([begin, end])
+    } else if (!beginIn && beginEnd) {
+        beginEnd.push(begin)
+    } else if (!beginEnd && beginIn) {
+        beginIn.push(end)
+    } else if (beginIn && beginEnd && beginIn != beginEnd) {
+        beginIn.concat(beginEnd)
+        allPointSet.splice(allPointSet.indexOf(beginEnd), 1)
+    }
+}
+
+function kruskal(pointSet, distance) {
+    let allPointSet = []
+    while (true) {
+        let begin = null
+        let end = null
+        let minDis = m
+        for (let i = 0; i < distance.length; i++) {
+            for (let j = 0; j < distance[i].length; j++) {
+                let temp_begin = pointSet[i]
+                let temp_end = pointSet[j]
+                let num = distance[i][j]
+                if (i != j && num < minDis && canLink(allPointSet, temp_begin, temp_end)) {
+                    begin = temp_begin
+                    end = temp_end
+                    minDis = distance[i][j]
+                }
+            }
+        }
+        begin.neighbor.push(end)
+        end.neighbor.push(begin)
+        link(allPointSet, begin, end)
+        if (allPointSet.length == 1 && allPointSet[0].length == pointSet.length) {
+            break
+        }
+    }
+    return allPointSet[0]
+}
+
+console.log(kruskal(pointSet, distance));
+```
