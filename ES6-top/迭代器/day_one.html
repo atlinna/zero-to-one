@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * js 规定 只要一个对象中含有next 方法 并且next方法返回 一个对象格式为*{value:'xxx',done:xxx} 那么 认为这个对象就是迭代器
+         *含义：去判断数组中是否还存在下一个元素并取出
+         */
+
+        let arr = [1, 2, 3, 4, 5, 6, 7];
+
+        let iterator = {
+            index: 0,
+            next() {
+                return {
+                    value: arr[this.index++],
+                    done: this.index >= arr.length,
+                };
+            },
+        };
+
+        /**
+         * 迭代器用法
+        */
+        // console.log(iterator.next())
+        // let dta = iterator.next()
+        // while(!dta.done){
+        //     console.log(dta.value)
+        //     dta = iterator.next()
+        // }
+        // console.log('迭代完成')
+
+
+        /**
+         * 迭代器生成器 iterator creator
+        */
+        const arr2 = [9, 8, 11, 33, 44, 66]
+        function getIterator(arr) {
+            let i = 0;
+            return {
+                next() {
+                    const result = {
+                        value: arr[i],
+                        done: i >= arr.length
+                    }
+                    i++
+
+                    return result
+                }
+            }
+        }
+
+        const ite1 = getIterator(arr)
+        const ite2 = getIterator(arr2)
+        console.log(ite1.next())
+        console.log(ite2.next())
+
+        /**
+         * 迭代器生成斐波那契数列  an = an-1 + an - 2
+        */
+
+        function getFeiboIterator() {
+            let prev1 = 1, prev2 = 1, index = 1
+            return {
+                next() {
+                    let val = ''
+                    if (index <= 2) {
+                        val = 1
+                    } else {
+                        val = prev1 + prev2
+                        prev1 = prev2
+                        prev2 = val
+                    }
+
+                    const ret = {
+                        value: val,
+                        done: false
+                    }
+
+                    index++
+
+                    return ret
+                }
+            }
+        }
+
+        // function getFeiboAdd() {
+        //     let dt = getFeiboIterator()
+        //     let count = 0
+        //     while()
+        // }
+        // console.log(().next())
+
+
+        /**
+         * 迭代协议
+         * 定义：一个对象具有知名符号属性Symbol.iterator 并且属性值是一个迭代器创建函数，则该对象是可以迭代的（iterable）
+        */
+
+        
+    </script>
+</body>
+
+</html>

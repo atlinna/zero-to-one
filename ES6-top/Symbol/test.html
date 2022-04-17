@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * 闭包
+         * 
+        */
+
+        // function test() {
+        //     let a = 1
+        //     function hello() {
+        //         console.log(a)
+        //     }
+        //     return hello()
+        // }
+        // test()
+
+        /**
+         * 
+         * 
+        */
+        let str = "1/N 2/Y 3/N 4/Y 5/Y"
+        function mainStart(string) {
+            let s = handleFommat(string)
+            let ob = midWare(s)
+            console.log(ob)
+        }
+
+        function handleFommat(str = "") {
+            let s_arr = str.split(' ')
+            let end_arr = s_arr.map(item => {
+                return item.split('/')
+            })
+            return end_arr
+        }
+
+        function midWare(arr = []) {
+            let arr_one = []
+            let arr_two = []
+            let lastOne = 'one'
+            let len = arr.length || 0
+            let keygen = ''
+
+            function choose(flag = "N") {
+                if (flag == 'N') {
+                    lastOne = lastOne == 'one' ? 'two' : 'one'
+                }
+                return lastOne
+            }
+            for (let i = 0; i < len; i++) {
+                if (arr[i][1] == 'Y' || arr[i][1] == 'N') {
+                    keygen = `arr_${choose(arr[i][1])}`
+                    console.log(keygen)
+                    if (i == 0) {
+                        arr_one.push(arr[i][0])
+                    } else {
+                        [keygen].push(arr[i][0])
+                    }
+                } else {
+                    return 'Error'
+                }
+            }
+            return {
+                arr_one, arr_two
+            }
+        }
+
+
+
+
+        mainStart(str)
+    </script>
+</body>
+
+</html>

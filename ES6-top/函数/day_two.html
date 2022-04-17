@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * 函数的两个用法
+         * 第一个是当做构造函数进行调用
+         * 第二个是直接调用
+         * 需要使用new.target进行判断当前是用什么方式进行调用
+        */
+        function Person(firstName, lastName) {
+            if (new.target === undefined) {
+                throw new Error("请使用new方法进行调用")
+            }
+            this.firstName = firstName;
+            this.lastName = lastName
+            this.fullName = `${this.firstName}_${this.lastName}`
+        }
+
+        let person = new Person('闫', '陈阳')
+        // Person('1','33')
+        // console.log(person.fullName);
+
+        /**
+         * arguments的缺陷
+         * 如果和形参配合使用容易造成混乱
+         * 内部使用arguments来实现造成函数无参数传递的假象导致阅读困难
+         * 
+         * 
+         * 
+         * 为了解决上述问题 ES6 推出剩余参数
+         * 定义在形参位置 ...args 形参名自定义
+         * 
+         * 1、一个函数仅能出现一个剩余参数
+         *
+        */
+        function getParams(param, ...args) {
+            if (param == 1) {
+                return args.join('-')
+            }
+            return args.join(' ')
+        }
+
+        //    console.log(getParams(1,1,2,3,4,5,6))
+        //    console.log(getParams(2,1,2,3,4,5,6))
+
+
+        /**
+         * z展开运算符
+         * 
+         * 数组展开
+         * 
+         *1、 将数组的每一项展开
+         *2、 克隆数组
+         *
+         * 
+         * 对象展开
+         * 扩展对象为一个新对象
+         * 操作灵活可运用同名属性覆盖的特性进行修改对象中的某些属性
+         * 浅拷贝对象
+         * 
+        */
+
+        let obj = {
+            name: 'm',
+            age: 19,
+            hobbies: {
+                hear: true,
+                listen: true,
+                play: false
+            }
+        }
+
+        let obj1 = {
+            ...obj
+        }
+
+
+        /**
+         * 如果使用箭头函数则不会存在arguments、new.target.如果使用了 则使用的是外层函数的this、new.target、arguments
+         * 箭头函数没有原型
+         * 箭头函数不能作为构造函数
+         * 
+         * 
+         * 使用场景
+         * 1、临时性函数并不会刻意调用它
+         * 2、异步处理函数（setTimeout、 ）
+         * 3、为了绑定外层函数的this
+         * 4、数组中的回调函数
+         * 5、保持代码简洁
+         * 
+        */
+
+    </script>
+</body>
+
+</html>

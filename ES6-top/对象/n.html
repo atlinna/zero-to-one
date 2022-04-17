@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        function setTitle(params, colorParams, callBack1, callBack2) {
+            window.lipayJSBridge.call('setTitle', params, data => {
+                callBack1(data)
+            })
+            window.AlipayJSBridge.call('setTitleColor', colorParams, data => {
+                callback2(data)
+            })
+            window.AlipayJSBridge.call('setBarBottomLineColor', {
+                color: 10066329
+            })
+        }
+        function ready(callback) {
+            if (window.AlipayJSBridge) {
+                callback && callback()
+            } else {
+                document.addEventListener('AlipayJSBridgeReady', callback, false)
+            }
+        }
+        window.onload = function () {
+            let colorParams = {
+                color: "#000000",
+                reset: false,
+                resetTransparent: false
+            }
+            ready(() => {
+                setTitle({ title: "标题" }, colorParams, () => { }, () => { })
+            })
+        }
+    </script>
+</body>
+
+</html>

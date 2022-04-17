@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        input {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="number" name="" id="" value="0"><br>
+    <input type="number" name="" id="" value="0"><br>
+    <input type="number" name="" id="" value="0"><br>
+    <input type="number" name="" id="" value="0"><br>
+    <input type="number" name="" id="" value="0"><br>
+    <input type="number" name="" id="" value="0"><br>
+    <input type="number" name="" id="" value="0"><br>
+    <input type="number" name="" id="" value="0"><br>
+    <input type="number" name="" id="" value="0"><br>
+    <input type="number" name="" id="" value="0"><br>
+
+
+    <div class="button">
+        <button id="btn">Click</button>
+    </div>
+
+    <div>
+        <h3>最大值：<span id="span_max"></span></h3>
+        <h3>最小值：<span id="span_min"></span></h3>
+    </div>
+
+    <script>
+        // 获取input dom 获取 dom元素的value
+        function getInputDomArr() {
+            let arr = document.getElementsByTagName('input')
+            let valArr = Array.prototype.slice.call(arr)
+            let val = valArr.map(item => Number(item.value)).sort()
+            return { max: val[val.length - 1], min: val[0] }
+        }
+
+        let btn = document.getElementById('btn')
+        let maxTarget = document.getElementById('span_max')
+        let minTarget = document.getElementById('span_min')
+
+
+
+        // ----------- ---------------- ---------------- 
+        btn.onclick = function () {
+            let obj = getInputDomArr()
+            console.log(obj)
+            setValues(obj)
+        }
+
+        function setValues(obj) {
+            maxTarget.innerHTML = obj.max
+            minTarget.innerHTML = obj.min
+        }
+
+
+
+    </script>
+</body>
+
+</html>

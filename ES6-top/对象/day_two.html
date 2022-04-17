@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * 1、可计算的成员名
+        */
+
+        /**
+         * 2、getter 和 setter
+         * Object.defineProperty
+         * get age(){} 相当于在类中创建了一个age的属性 然后读取的时候调用该函数
+         * set age(){} 相当于在勒种创建了一个age属性 赋值时调用该函数
+        */
+
+        // class Animal {
+        //     constructor(type, age) {
+        //         this.type = type
+        //         this._age = age
+        //     }
+        //     get age() {
+        //         return this._age + 'year old'
+        //     }
+
+        //     set age(a) {
+        //         if (a < 0) {
+        //             a = 0
+        //         } else if (a > 100) {
+        //             a = 100
+        //         }
+        //         this._age = a
+        //     }
+        // }
+
+        // var an = new Animal('狗', 10)
+
+
+
+        /**
+         * 3、静态成员
+         * 静态成员表示的就是通过类构造函数 new 出来的 对象 会默认带有的属性或属性方法
+        */
+
+        class Animal {
+            constructor(type, age) {
+                this.type = type
+                this._age = age
+            }
+            static eyes = 2
+            static sleep() {
+                console.log('z Z Z Z')
+            }
+            get age() {
+                Animal.sleep()
+                return this._age + 'year old'
+            }
+
+            set age(a) {
+                if (a < 0) {
+                    a = 0
+                } else if (a > 100) {
+                    a = 100
+                }
+                this._age = a
+            }
+        }
+
+        // var an = new Animal('熊', 100)
+        // console.log(an)
+        // an.sleep()
+
+        /**
+         * 4、字段初始化器
+        */
+
+        const A = class {
+            a = 1
+            b = 2
+
+            print = () => {
+                console.log(this.a)
+            }
+        }
+
+        let an = new A()
+        console.log(an)
+
+        /**
+         * 5、类表达式
+        */
+
+        const A = class {
+            a = 1
+            b = 2
+        }
+
+        let an = new A()
+        console.log(an)
+
+        /**
+         * 6、装饰器
+        */
+        function setTitle(params, colorParams, callBack1, callBack2) {
+            window.lipayJSBridge.call('setTitle', params, data => {
+                callBack1(data)
+            })
+            window.AlipayJSBridge.call('setTitleColor', colorParams, data => {
+                callback2(data)
+            })
+            window.AlipayJSBridge.call('setBarBottomLineColor', {
+                color: 10066329
+            })
+        }
+        function ready(callback) {
+            if (window.AlipayJSBridge) {
+                callback && callback()
+            } else {
+                document.addEventListener('AlipayJSBridgeReady', callback, false)
+            }
+        }
+        window.onload = function () {
+            let colorParams = {
+                color: "#000000",
+                reset: false,
+                resetTransparent: false
+            }
+            ready(() => {
+                setTitle({ title: "标题" }, colorParams, () => { }, () => { })
+            })
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        class Element {
+            constructor(name, weight) {
+                this.name = name;
+                this.weight = weight
+                this.print()
+            }
+
+            print() {
+                console.log('大象名称：', this.name, '重量：', this.weight + 'kg')
+            }
+        }
+
+        class Frige {
+            constructor(weightAll = 500) {
+                this.targets = [];
+                this.weightAll = weightAll;
+                this.len = this.targets.length
+            }
+
+            openDoor() {
+                console.log('open door')
+            }
+
+            frigePush(target) {
+                this.targets.push(target)
+                this.len = this.targets.length
+                let allweight = this.computed()
+                this.print(allweight)
+            }
+
+            closeDoor() {
+                console.log('close door')
+            }
+
+            print(params) {
+                console.log('当前数量', this.len, '已用容量', params + 'kg', '剩余容量', this.restWeight(params) + 'kg')
+            }
+
+            computed() {
+                let allweight = 0
+                this.targets.forEach(item => {
+                    allweight += item.weight
+                })
+                return allweight
+            }
+
+            restWeight(param) {
+                let val = this.weightAll - param
+                if (val < 0) throw new Error('已超过冰箱容量，请取出!')
+                return val
+            }
+        }
+
+
+        let ele1 = new Element('嘻嘻', 100)
+        let ele2 = new Element('哈哈', 200)
+        let ele3 = new Element('嗯嗯', 200)
+
+
+
+        let frige = new Frige();
+        frige.openDoor()
+        frige.frigePush(ele1)
+        frige.frigePush(ele2)
+        frige.frigePush(ele3)
+
+        frige.closeDoor()
+    </script>
+</body>
+
+</html>

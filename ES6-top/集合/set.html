@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * set集合用来存放不重复的数据
+         * 
+         * 创建方式
+         * new Set()
+         * 创建一个没有内容的Set集合
+         * new Set(iterale) 
+         * 创建一个 带有初始值的Set集合 初始值是传入的可迭代对象的每次迭代后的值
+         * Set集合是 可迭代对象  iterable
+         * ！！！！！！！！！！！！！！
+         * 注意 set 集合中不存在下标  没有索引
+        */
+
+        const s1 = new Set()
+        const s2 = new Set([1, 2, 3, 4, 4, 4, 4, 4, 4])
+
+
+        /**
+         * set 集合的后续操作
+         * add -- 添加一个数据到set集合末尾
+         * Set 集合 是通过 Object.is来判断数据是否相同 除（+0，-0）
+         * ------------------------
+         * has -- 判断集合中是否有这个数据
+         * delete -- 删除匹配的数据
+         * clear -- 清空整个set
+         * size -- 获取set集合中的个数
+        */
+    </script>
+</body>
+
+</html>

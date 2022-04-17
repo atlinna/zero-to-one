@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+        * M 多少个数
+        * str 空格隔开的数组
+        * N 几个
+        */
+        function mainStart(M, str, N) {
+            if (M == 1) return -1
+            let arr = getSortNum(str)
+            let ob = getMaxOrMin(arr, N)
+            for (let i = 0; i < N; i++) {
+                if (isCheck(ob.max[i], ob.min)) {
+                    console.log(-1)
+                    return -1
+                }
+            }
+            let ret = sum(ob)
+            console.log(ret.max + ret.min)
+        }
+
+        function getSortNum(str) {
+            let s = str.split(' ')
+            let set = new Set(s)
+            let arr = [...set].map(item => {
+                return Number(item)
+            })
+            return arr.sort((a, b) => a - b)
+        }
+
+        function getMaxOrMin(arr = [], N) {
+            let min = arr.slice(0, N)
+            let max = arr.slice(arr.length - N, arr.length)
+            return { max, min }
+        }
+
+        function isCheck(target, source) {
+            return source.includes(target)
+        }
+
+        function sum(obj = {}) {
+            return {
+                max: obj.max.reduce((prev, item) => {
+                    return prev + item
+                }, 0),
+                min: obj.min.reduce((prev, item) => {
+                    return prev + item
+                }, 0),
+            }
+        }
+
+        // mainStart(6, '2 3 1 5 12 7', 2)
+        mainStart(4, '1 7 1 2 2', 2)
+
+    </script>
+</body>
+
+</html>

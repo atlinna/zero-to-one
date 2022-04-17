@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * 回顾
+         * 属性描述符 Property descriptor  用于描述一个属性的相关信息
+         * 通过Object.getOwnPropertyDescriptor(对象名，属性名) 可以得到对象中的任意一个属性的属性描述符
+         * configurable: true  -- 该属性的描述符是否可以被修改
+         * enumerable: true -- 该属性是否可以被枚举
+         * value: 1  -- 属性值
+         * writable: true  -- 该属性是否可以被重新赋值
+         * 
+         * Object.getPropertyDescriptor() 获取对象中全部属性的属性描述符
+        */
+
+        const user = {
+            a: 1,
+            b: 2
+        }
+        // console.log(Object.getOwnPropertyDescriptor(user, 'a'))
+
+
+        /**
+         * 如果想要为某个对象添加属性 或修改属性时 配置他的属性描述符可以使用Object.defineProperty(对象，属性名，描述符)
+         * 如果要配置多个属性可以使用Object.defineProperties(对象，描述符)
+        */
+
+        Object.defineProperty(user, 'a', {
+            value: 4,
+            configurable: false,// 值为false 之后再使用defineProperty修改a属性的配置会异常
+            enumerable: false,//值为false 将会影响Object.keys() 和 Object.values 的结果
+            writable: false//值为false a属性的值将不可更改
+        })
+        user.a = 10
+        console.log(user, Object.keys(user), Object.values(user));
+
+        //  Object.defineProperties(user,{
+        //      a:{
+        //          value:5,
+        //          configurable:true,
+
+        //      }
+        //  })
+
+        /**
+         * 存取器属性 -- Object.defineProperty()
+         * get 和 set 
+         * 如果想要通过get\set 得到、设置返回值（存取器没有存储空间，）可以使用一个新的属性值让其暂存读取值
+         * 存取器存在的最大意义就是读取和设置属性值
+        */
+
+        Object.defineProperty(user, 'c', {
+            get() {
+                console.log('get函数')
+                return user._a
+            },
+            set(val) {
+                console.log('set函数', val)
+                user._a = val
+            }
+        })
+        // user.c = 1 --> set(1)
+        // user.c = 1
+        // console.log(user.c) --> get()
+        // user.c = user.c + 1 --> get() + 1 --> undefined + 1 --> NaN
+        user.c = user.c + 1
+        console.log(user.c)
+    </script>
+</body>
+
+</html>

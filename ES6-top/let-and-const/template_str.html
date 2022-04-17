@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <!-- <img src="" alt="" class="i" /> -->
+  <div class="container"></div>
+  <script>
+    // let arrayLike = {
+    //   0: "hello",
+    //   1: " - ",
+    //   2: "world",
+    //   length: 4,
+    // };
+    // let arr = [1,2,3,4,5]
+    // console.log([].copyWithin(1,2,3).call(arrayLike))
+    let arr = [1, 2, 23, NaN, 5];
+    // let obj = {
+    //   name: "xiaoming",
+    //   age: 18,
+    // };
+    // let flag = arr.findIndex(function (item){
+    //   return Object.is(NaN,item)
+    // }, obj);
+    // console.log(arr.entries());
+    // for (let item of arr.entries()) {
+    //   console.log(item)
+    // }
+    // console.log(arr.includes(2))
+    // let obj = {
+    //   name: "xiaoming",
+    //   age: 14,
+    //   hobbies: ["basketball", "football", "pinpang"],
+    //   handler() {
+    //     console.log("hello world");
+    //   },
+    // };
+
+    // let sobj = {};
+    // let nobj = null;
+
+    // let s = nobj ?? sobj;
+    // console.log(s)
+    // console.log(obj?.sex|| 'none')
+    // obj.handler?.()
+
+
+
+
+
+
+    /**
+     * template 模板字符串自定义模式
+    */
+    let str = '<h1>hello world</h1>'
+    let temp_str = switchHandler`Hei Susan do ${str}.`
+
+
+    function switchHandler(parts) {
+      const pts = parts
+      const args = Array.prototype.slice.apply(arguments)
+      const rest = args.slice(1)
+      // console.log('参数', pts, rest)
+      let s = rest.reduce((prev, item, index) => {
+        // console.log(prev, item, index)
+        item = item.replace(/\</g, '&lt;')
+        item = item.replace(/\>/g, '&gt;')
+        console.log(item)
+        if (rest.length - 1 == index) {
+          return prev + parts[index] + item + parts[index + 1]
+        }
+        return prev + parts[index] + item
+      }, '')
+      return s
+    }
+    console.log(temp_str)
+    let oDiv = document.querySelector('.container')
+    oDiv.innerHTML = temp_str
+
+  </script>
+</body>
+
+</html>

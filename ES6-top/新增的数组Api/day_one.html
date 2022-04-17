@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * Array.of(5) 初始化一个长度为1 值为5的数组
+        */
+        //    console.log(Array.of(5))
+        let arr = [
+            { name: 'a', id: 1 },
+            { name: 'b', id: 2 },
+            { name: 'c', id: 3 },
+            { name: 'd', id: 4 },
+            { name: 'e', id: 5 },
+            { name: 'f', id: 6 },
+        ]
+        const ret1 = arr.find(item => item.id == 1)
+        // console.log(ret1)
+        const ret2 = arr.findIndex(item => item.id == 10)
+        // console.log(ret2)
+
+        let arr1 = new Array(100)
+        arr1.fill('abc')
+        // console.log(arr1)
+        let arr2 = [1,2,3,4,5,6]
+        // console.log(arr2.copyWithin(1)) //[1,1,2,3,4,5]
+        console.log(arr2.copyWithin(1,1)) //[1,2,3,4,5,6]
+    </script>
+</body>
+
+</html>

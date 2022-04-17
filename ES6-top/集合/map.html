@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * map 注意：
+         * 1、键名必须是字符串
+         * 2、获取数据的数量不方便
+         * 3、键名容易和原型上的名称冲突
+         * 
+         * 如何创建map
+         * new Map(iterable)
+         * 创建带有初始值的map
+         * new Map([['键','值'],['键','值']])
+         * 
+         * 
+         * 
+         * 
+        */
+
+        /**
+         * map 的操作
+         * 
+         * size：获取数量
+         * set(键，值) 设置一对键值对  键名不能重复  如果键不存在则新增  如果存在 则修改他的值
+         * get(键)  根据键得到对应的值
+         * delete(键) 删除键值对
+         * clear() 清空map
+         * 
+         * 
+        */
+
+        /**
+         * 和数组进行转换
+         * 
+         * 遍历
+        */
+        const mp1 = new Map([['a', 1], ['b', 2], ['c', 3]])
+
+        const arr = [...mp1]
+
+        for (const item of mp1){
+            console.log(item)
+        }
+        console.log(arr)
+    </script>
+</body>
+
+</html>

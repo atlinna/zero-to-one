@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * 代理与反射
+         * Reflect 是一个内置的JS对象，他提供了一系列方法 由于其功能类似其他语言的反射功能 所以取名 Reflect
+         * 主要是  为了减少魔法  
+        */
+
+
+        /**
+         * Reflect 提供的API
+         * Reflect.set(target,propertyKey,value) 设置对象target 中propertyKey属性的值为value
+         * Reflect.get(target,propertyKey) 获取对象target中propertyKey属性的值
+         * Reflect.applay(target,thisArgument,argumentList) 调用一个指定的函数，并绑定this属性和参数列表，等同于函数调用
+         * Reflect.deleteProperty(target,propertyKey) 删除对象target的一个属性
+         * Reflect.defineProperty(target,property,attributes)  类似于Object.defineProperty
+         * Reflect.construct(target,argumentList) 用构造函数的方式创建对象  类似于new 关键字
+         * Reflect.has(target,propertyKey) 判断对象target中是否含有属性propertyKey 类似于 in 关键字
+        */
+
+        const user = {
+            name: '小明',
+            age: 19
+        }
+
+        user.age = 18
+        Reflect.set(user, 'age', 20)
+        Reflect.deleteProperty(user,'name')
+       console.log('age' in user)
+
+    </script>
+</body>
+
+</html>

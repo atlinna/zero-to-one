@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./echarts.min.js"></script>
+    <script src="./echarts-liquidfill.min.js"></script>
+</head>
+
+<body>
+    <div class="love"></div>
+    <script>
+        var myChart = echarts.init(document.getElementById("love"));
+        var data = [{
+            value: 0.9,
+            direction: 'left',
+            itemStyle: {
+                color: '#fff'
+            }
+        }, 0.6, 0.7, 0.4];
+
+        var option = {
+            series: [{
+                type: 'liquidFill',
+                radius: '80%',
+                center: ['50%', '50%'],
+                shape: 'path://m67.25,28.9c27.42,-69.1 134.84,0 0,88.85c-134.84,-88.85 -27.42,-157.96 0,-88.85z', //心形
+                data: data,
+                label: {
+                    fontSize: 28,
+                    fontWeight: 400,
+                    color: '#fff',
+                    formatter: function (params) {
+                        return "郭靖&黄蓉";
+                    }
+                },
+                backgroundStyle: {
+                    color: {
+                        type: 'linear',
+                        x: 1,
+                        y: 0,
+                        x2: 0.5,
+                        y2: 1,
+                        colorStops: [{
+                            offset: 1,
+                            color: 'rgba(255, 255, 255, 0)'
+                        }, {
+                            offset: 0.5,
+                            color: 'rgba(255, 255, 255, .25)'
+                        }, {
+                            offset: 0,
+                            color: 'rgba(255, 255, 255, 1)'
+                        }],
+                        globalCoord: false
+                    },
+                },
+                itemStyle: {
+                    color: '#ff0033'
+                },
+                emphasis: {
+                    color: '#ff0033'
+                },
+                outline: {
+                    borderDistance: 5, // 边框线与图表的距离 数字
+                    itemStyle: {
+                        borderWidth: 10, // 边框的宽度
+                        borderColor: 'rgba(249, 75, 85, 1)' // 边框颜色
+                    }
+                },
+            }]
+        };
+
+        myChart.setOption(option);
+        window.addEventListener("resize", function () {
+            myChart.resize();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container">
+        <span></span>
+        <span></span>
+    </div>
+    <script>
+        /**
+         * Proxy 代
+         * 提供了修改底层的方式
+         * 
+        */
+
+        // new Proxy(obj,handler)
+        // 观察者模式的优化 使用Proxy 代替defineProperty
+        function observe(target, element) {
+            const con = document.querySelector(element)
+            const obj = {}
+            let keys = Object.keys(target)
+            let proxy = new Proxy(target, {
+                set(target, propertyKey, value) {
+                    Reflect.set(target, propertyKey, value)
+                    render(con)
+                },
+                get(target, propertyKey) {
+                    return Reflect.get(target, propertyKey)
+                },
+                defineProperty(target, propertyKey, attributes) {
+                    Reflect.defineProperty(target, propertyKey, attributes)
+                }
+            })
+
+            // console.log(obj)
+            render(con)
+
+            function render(h, item = "") {
+                console.log(item)
+                let ht = ''
+                for (const prop of Object.keys(obj)) {
+                    ht += `<span>${prop}:</span><span>${obj[prop]}</span><br>`
+                }
+                con.innerHTML = ht
+                // console.log(ht)
+            }
+            return obj
+        }
+        let onsp = {
+            a: 1,
+            b: 2
+        }
+        let targets = observe(onsp, '.container')
+    </script>
+</body>
+
+</html>

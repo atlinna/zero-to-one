@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .point {
+            width: 10px;
+            height: 10px;
+            background: #333;
+            border-radius: 50%;
+            position: absolute;
+            left: 0;
+            right: 0;
+        }
+
+        .snake_head {
+            width: 20px;
+            height: 10px;
+            background: #000;
+            position: absolute;
+            left: 0;
+            top: 0;
+            border-radius: 0 50% 50% 0;
+        }
+
+
+        .snake_body {
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            background: #000;
+            left: 0;
+            top: 0;
+        }
+
+        .container {
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!--  -->
+    </div>
+</body>
+
+<script>
+
+    let con = document.querySelector('.container')
+
+    // 点 类型
+    class Point {
+        constructor(layout, x = 0, y = 0) {
+            this.x = x
+            this.y = y
+            this.min = 200
+            this.max = 700
+            this.container = layout
+            this.targe = null
+            this.initPoint()
+            this.createTarget()
+        }
+
+        initPoint() {
+            this.x = this.createXY()
+            this.y = this.createXY()
+        }
+
+        createXY() {
+            let m = Math.round(Math.random() * (this.max - this.min) + this.min)
+            return m
+        }
+
+        createTarget() {
+            let div = document.createElement('div')
+            this.targe = div
+            div.setAttribute('class', 'point')
+            div.style.left = this.x + 'px'
+            div.style.top = this.y + 'px'
+            this.container.appendChild(div)
+        }
+
+        removeTarget() {
+            this.container.removeChild(this.targe)
+            this.targe = null
+        }
+    }
+
+
+    class MoveThing {
+        constructor(con, speed = 0.5) {
+            this.container = con
+            this.catsh = 'right'//方向
+            this.x = 0  //头的横坐标
+            this.y = 0  //头的纵坐标
+            this.speed = speed //速度
+            this.taps = 3 //步长
+            this.head = null
+            this.ariys = { x: 0, y: 0 }
+            this.length = 0
+            this.bodyArr = []
+        }
+
+        initHandler() {
+            let _this = this
+            this.initPoint()
+            document.addEventListener('keydown', function (e) {
+                // console.log(e)
+                let wich = e.keyCode
+                switch (wich) {
+                    case 37:
+                        _this.catsh = 'left'
+                        break;
+                    case 38:
+                        _this.catsh = 'top'
+                        break
+                    case 39:
+                        _this.catsh = 'right'
+                        break
+                    case 40:
+                        _this.catsh = 'bottom'
+                        break
+                    default:
+                        _this.catsh = 'right'
+                }
+                _this.turnHead()
+            })
+            this.createSnakeHead()
+            setInterval(() => {
+                this.airsMove()
+            }, 30)
+        }
+        // 方向变换
+        getDeg() {
+            if (this.catsh == 'left') return 180
+            if (this.catsh == 'top') return -90
+            if (this.catsh == 'bottom') return 90
+            return 0
+        }
+        // 
+        turnHead() {
+            this.head.style.transform = `rotate(${this.getDeg()}deg)`
+        }
+        // 创建头
+        createSnakeHead() {
+            let snake_head = document.createElement('div')
+            this.head = snake_head
+            snake_head.setAttribute('class', 'snake_head')
+            this.container.appendChild(snake_head)
+        }
+
+        airsMove() {
+            // console.log(this.catsh)
+            if (this.catsh == 'left' || this.catsh == 'right') {
+                this.x += this.getVairs() * this.taps
+            }
+            if (this.catsh == 'top' || this.catsh == 'bottom') {
+                this.y += this.getVairs() * this.taps
+            }
+            this.headMove()
+            this.eatPoint()
+            // console.log(this.x, ',', this.y)
+        }
+
+        getVairs() {
+            if (this.catsh == 'right' || this.catsh == 'bottom') {
+                return 1
+            }
+            return -1
+        }
+
+        headMove() {
+            // console.log(this.head)
+            this.head.style.left = this.x + 'px'
+            this.head.style.top = this.y + 'px'
+            this.bodyArr.forEach((item, index) => {
+                if (this.catsh == 'left' || this.catsh == 'right') {
+                    item.style.left = this.x - (index + 1) * 10 * this.getVairs() + 'px'
+                    item.style.top = this.y + 'px'
+                } else {
+                    item.style.left = this.x + 'px'
+                    item.style.top = this.y - (index + 1) * 10 * this.getVairs() + 'px'
+                }
+
+            })
+        }
+
+        initPoint() {
+            let point = new Point(this.container)
+            this.ariys = {
+                x: point.x,
+                y: point.y,
+                point
+            }
+            // console.log(point)
+        }
+        // target2 为 点 ariys
+        teachPoint(target1, target2) {
+            if (target1 + 10 > target2 - 5 && target1 - 10 < target2 + 5) {
+                return true
+            }
+            return false
+        }
+
+        eatPoint() {
+            if (this.teachPoint(this.x, this.ariys.x) && this.teachPoint(this.y, this.ariys.y)) {
+                this.ariys.point.removeTarget()
+                this.initPoint()
+                this.length += 1
+                console.log(this.length)
+                this.createBody()
+            }
+        }
+
+        createBody() {
+            let bo = document.createElement('div')
+            bo.setAttribute('class', 'snake_body')
+            if (this.catsh == 'left' || this.catsh == 'right') {
+                bo.style.left = this.x - (this.length * 10) * this.getVairs() + 'px'
+                bo.style.top = this.y + 'px'
+            } else {
+                bo.style.left = this.x + 'px'
+                bo.style.top = this.y - (this.length * 10) * this.getVairs() + 'px'
+            }
+            this.bodyArr.push(bo)
+            this.container.appendChild(bo)
+        }
+    }
+
+
+    // new Point(con, 1, 1)
+    let snake = new MoveThing(con)
+    snake.initHandler()
+
+</script>
+
+</html>

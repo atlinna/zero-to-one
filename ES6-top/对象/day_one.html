@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        /**
+         * 计算属性名
+         * 使用中括号来表示
+         * 
+        */
+        const prop = 'name'
+        const user = {
+            [prop]: 'Lucas',
+            sayHello() {
+                console.log(this[prop])
+            }
+        }
+
+        // console.log(user, user.sayHello())
+
+        /**
+         * Object 是函数  （构造函数）
+         * Object 新增API
+         * Object.is 用于判断两个数据是否相等与=== 效果一致 除以下两种情况  
+         1、NaN 与 NaN 
+         2、+0 与 -0
+         * Object.assign(obj1,obj2)  作用是用来混合对象 用obj2覆盖obj1 然后返回obj1 但是这样会改变obj1  可使用Object.assign({},obj1,obj2)来避免 
+         * Object.getOwnPropertyNames 返回一个数组 里面是对象的属性名   排序规则：
+         1、先排数字，升序排序
+         2、再排其他，顺序不变
+         * Object.setPrototypeOf  作用就是将对象的隐士原型改为第二个参数
+         Object.setPrototypeOf(obj1,obj2) ==== obj1.__proto__ = obj2
+        */
+
+        // hasOwnProperty
+
+        /**
+        * 面向对象
+
+        */
+        class Animal {
+            constructor(type, name, age) {
+                this.type = type;
+                this.name = name;
+                this.age = age
+            }
+
+            print() {
+                console.log(this.type, this.name, this.age)
+            }
+        }
+
+        const an = new Animal('够', 'dd', 18)
+        // console.log(an)
+        an.print()
+    </script>
+</body>
+
+</html>

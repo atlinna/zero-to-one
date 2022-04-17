@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * 生成器异步应用
+         * 使用生成器处理同、异步函数
+        */
+
+        function getParams() {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve('一步返回')
+                }, 1000)
+            })
+        }
+
+        function* task() {
+            const a = yield 1
+            const b = yield 'abs'
+            const ret = yield getParams()
+            console.log(a, b, ret)
+        }
+
+        run(task)
+
+        function run(generatorFunc) {
+            const generator = generatorFunc() //生成这个生成器
+            let result = generator.next() //启动生成器
+            handleDoParams()
+            function handleDoParams() {
+                // 判断生成器迭代是否完成 如果完成则不作任何操作
+                if (result.done) {
+                    return
+                }
+                // 如果返回值类型是Promise
+                if (typeof result.value.then === 'function') {
+                    result.value.then(data => {
+                        result = generator.next(data)
+                        handleDoParams()
+                    })
+                } else {
+                    result = generator.next(result.value)
+                    handleDoParams()
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

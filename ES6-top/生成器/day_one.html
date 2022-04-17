@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+        * 生成器 Generator
+        * 生成器是通过Generator 这个构造函数 得到的对象 就是 生成器
+        * 生成器 外部是访问不了的
+        * 生成器的创建  -- 必须使用生成器创建函数 Generator Function
+        * 生成器有返回值 ，  返回值为done为true 的第一项的value
+        * 生成器可以传参数  传递的参数会交给上一个yield 的表达式的返回值
+        * 如果第一次调用next 函数时传递参数 无效！！！！
+        */
+
+
+
+        function* method() {
+            // let value = yield 1;
+            // console.log(value)
+            // value = yield 2 + value;
+            // console.log(value)
+            yield 1
+            yield 2
+            yield 3
+            return 10
+        }
+
+        const generator = method()
+
+        /**
+         * 生成器其他api
+         * return 放发 可以提前结束 生成器的过程 从而结束迭代过程
+         * throw 抛出异常 在迭代的第n步中
+         * 在生成器中可以调用其他生成器
+         * 
+        */
+
+        function* test() {
+            yield 'a'
+            yield 'b'
+            yield 'c'
+            yield* method()
+            return 'd'
+        }
+
+        const gen = test()
+
+    </script>
+</body>
+
+</html>
