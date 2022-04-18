@@ -49,3 +49,14 @@ export NODE_ENV = 'development'
 + npm config ls | list --json
 + npm config set 设置配置
 + npm config get 获取配置项
+
+### 包的发布流程
+发布包
++ 1、移除淘宝镜像源
++ 2、登录npmorg 注册
++ 3、
+  + npm login 登录
+  + npm logout 登出
+  + npm whoami 查看账户
++ 4、创建工程根目录
++ 使用 npm publish 发布命令
