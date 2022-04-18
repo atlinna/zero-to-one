@@ -94,6 +94,86 @@ let 不允许重复声明，且在声明之前无法使用。
   ```
   如上，i 会提升到全局作用域中，我们打印 i 只能打印出 i 最后的结果 10.
   我们希望的是，这个变量只控制循环，在循环体结束后，这个变量消失。
+  
+块级作用域还有一个最大的特点就是，**不能读取内层作用域内的变量，但是内层作用域可以定义与外层作用域内同名的变量。**
+
+**块级作用域与函数声明**
+函数能否在块级作用域中声明呢？
+在 ES5 中，函数只能在全局作用域或函数作用域中进行声明，不得在块级作用域中声明。
+```
+    function hello() {
+        if (false) {
+            function testBlock() { console.log('this is a test'); }
+        }
+    }
+
+
+    try {
+        function testBlock() { console.log('this is a test'); }
+    } catch (e) {
+        console.log(e);
+    }
+```
+上述代码中声明函数的方式都是不合法的。
+但是哈，人家浏览器就想了，你们 JS 的规则关我屁事，如果遵守你的规则那我以前的小弟们怎么办。于是，为了兼容旧代码，浏览器并没有遵守这个规则，它支持你在块级作用域中声明函数，并不会报错。
+
+ES6 引入了块级作用域这个概念，明确允许在块级作用域中声明函数。
+ES6 规定，**块级作用域中，函数声明的行为类似于 let ，在块级作用域外 不可引用！！**
+
+```
+    function testBlock() {
+        console.log('this is test global');
+    }
+
+    void function hello() {
+        if (false) {
+            function testBlock() { console.log('this is a hello'); }
+        }
+        testBlock()
+    }()
+```
+上面代码如果在 ES5 中执行应该是打印 this is hello ，在 ES6 中执行应该是 this is test global，因为 ES5 中会将 testBlock 提升到作用域头部，如：
+```
+    function testBlock() {
+        console.log('this is test global');
+    }
+
+    void function hello() {
+        function testBlock() { console.log('this is a hello'); }
+        if (false) {
+        }
+        testBlock()
+    }()
+```
+但是，当我们真正执行这段代码的时候发现，竟然报错了
+
+原来，如果改变了块级作用域内声明的函数的处理规则，显然会对老代码产生很大影响。为了减轻因此产生的不兼容问题，ES6 在附录 B里面规定，浏览器的实现可以不遵守上面的规定，有自己的行为方式。
++ 允许在块级作用域内声明函数
++ 函数声明类似于 var，意味着会提升到全局作用域或函数作用域头部，值为 undefined
++ 同时，函数声明还会提升到所在的块级作用域的头部。
+
+也就是说我们之间执行的实际上是下面的这段代码：
+```
+    function testBlock() {
+        console.log('this is test global');
+    }
+
+    void function hello() {
+        var testBlock = undefined
+        if (false) {
+            function testBlock() { console.log('this is a hello'); }
+        }
+        testBlock() // testBlock is not a function
+    }()
+```
+
+那么综合以上情况，我们要考虑下是否要在块级作用域下声明函数了，也不是说不能声明。但是如果使用的话，还是使用函数表达式的方式。
+```
+    if(false){
+        let testBlock = function (){console.log('this is test block')}
+    }
+```
+另外，ES6的块级作用域允许声明函数的规则，只在使用花括号({})的形式下存在，否则会报错。
 
 应用：
 
