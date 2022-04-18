@@ -17,6 +17,16 @@
 
 - - -
 
+** 包管理工具
+[前端包管理工具-npm](/NPM/index.md)
+
+- - -
+
+** 模块化**
+[前端模块化](/Module/index.md)
+
+- - -
+
 **打包工具**
 + [Webpack](/Webpack/index.md)
 + [Vite](/Vite/index.md)
