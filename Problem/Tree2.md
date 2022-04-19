@@ -134,3 +134,36 @@ function searchByTree(root, target) {
        return left_ret && right_ret
    }
 ```
+
+### 二叉树单旋
+
+```
+// 右单旋
+function rightRotate(root) {
+    if (!root) return
+    let newRoot = root.left;
+    root.left = newRoot.right
+    newRoot.left = root
+    return newRoot
+}
+// 左单旋
+function leftRotate(root) {
+    if (!root) return
+    let newRoot = root.right;
+    root.right = newRoot.left
+    newRoot.left = root
+    return newRoot
+}
+
+function changeTree(root) {
+    if (!root) return null
+    let left_deep = getDeep(root.left)
+    let right_deep = getDeep(root.right)
+    if (left_deep - right_deep > 1) { // 左边深，右边浅
+        return rightRotate(root)
+    } else if (right_deep - left_deep > 1) { // 右边深，左边浅
+        return leftRotate(root)
+    }
+    return root
+}
+```
