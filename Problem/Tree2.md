@@ -109,3 +109,7 @@ function searchByTree(root, target) {
 + 根节点的左右子树的高度差不能大于1
 + 这颗二叉树的每个子树都符合第一条
 
+
+
+**二叉树单璇**
+
