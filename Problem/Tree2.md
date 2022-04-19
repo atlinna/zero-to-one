@@ -101,7 +101,6 @@ function searchByTree(root, target) {
 **我们希望将二叉搜索树变成二叉平衡树。**
 
 
-
 ### 平衡二叉树
 
  首先先看一下平衡二叉树的特点
@@ -109,3 +108,29 @@ function searchByTree(root, target) {
 + 根节点的左右子树的高度差不能大于1
 + 这颗二叉树的每个子树都符合第一条
 
+代码实现如何判断一棵树是否为平衡二叉树：
+```
+   /**
+    * 
+    * @param {根节点} root 
+    * 获取树的深度
+    */
+   function getDeep(root) {
+       if (!root) return 0
+       let l = getDeep(root.left) + 1
+       let r = getDeep(root.right) + 1
+       return Math.max(l, r)
+   }
+
+   function isBalance(root) {
+       if (!root) return true
+       let left_deep = getDeep(root.left)
+       let right_deep = getDeep(root.right)
+       if (Math.abs(left_deep - right_deep) > 1) {
+           return false
+       }
+       let left_ret = isBalance(root.left)
+       let right_ret = isBalance(root.right)
+       return left_ret && right_ret
+   }
+```
