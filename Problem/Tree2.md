@@ -138,33 +138,70 @@ function searchByTree(root, target) {
 ```
 
 ### 二叉树单旋
+**左单旋特点:**左边浅右边深，左旋
++ 新根节点为根节点的右子树
++ 根节点的右子树为新根节点的左子树
++ 新根节点的左子树为根节点
 
+**右单旋特点:**右边浅左边深，右旋
++ 新根节点为根节点的左子树
++ 根节点的右子树为新根节点的右子树
++ 新根节点的右子树为根节点
 ```
-// 右单旋
-function rightRotate(root) {
-    if (!root) return
-    let newRoot = root.left;
-    root.left = newRoot.right
-    newRoot.left = root
-    return newRoot
-}
-// 左单旋
+/**
+ * 二叉树左单旋
+ * @param {*} root 
+ */
 function leftRotate(root) {
     if (!root) return
-    let newRoot = root.right;
+    let newRoot = root.right
     root.right = newRoot.left
     newRoot.left = root
     return newRoot
 }
 
-function changeTree(root) {
-    if (!root) return null
+/**
+ * 二叉树右单旋
+ * @param {*} root 
+ */
+function rightRotate(root) {
+    if (!root) return
+    let newRoot = root.left
+    root.left = newRoot.right
+    newRoot.right = root
+    return newRoot
+}
+
+/**
+ * 将树变为平衡二叉树
+ * @param {*} root 
+ * @returns 
+ */
+function changeSearchTree(root) {
+    if (isBalance(root)) return root
+    if (!root) return
+    if (root.left) root.left = changeSearchTree(root.left)
+    if (root.right) root.right = changeSearchTree(root.right)
     let left_deep = getDeep(root.left)
     let right_deep = getDeep(root.right)
-    if (left_deep - right_deep > 1) { // 左边深，右边浅
-        return rightRotate(root)
-    } else if (right_deep - left_deep > 1) { // 右边深，左边浅
-        return leftRotate(root)
+    if (left_deep - right_deep > 1) {
+        // 左边深，需要右旋
+        let changeTreeDeep = getDeep(root.left.right)
+        let noChangeTreeDeep = getDeep(root.left.left)
+        if (changeTreeDeep > noChangeTreeDeep) root.left = leftRotate(root.left)
+        let newRoot = rightRotate(root)
+        newRoot = changeSearchTree(newRoot)
+        return newRoot
+    } else if (right_deep - left_deep > 1) {
+        // 右边深，需要左旋
+        let changeTreeDeep = getDeep(root.right.left)
+        let noChangTreeDeep = getDeep(root.right.right)
+        if (changeTreeDeep > noChangeTreeDeep) {
+            root.right = rightRotate(root.right)
+        }
+        let newRoot = leftRotate(root)
+        newRoot = changeSearchTree(newRoot)
+        return newRoot
     }
     return root
 }
