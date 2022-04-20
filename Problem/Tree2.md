@@ -148,61 +148,78 @@ function searchByTree(root, target) {
 + 根节点的右子树为新根节点的右子树
 + 新根节点的右子树为根节点
 ```
-/**
- * 二叉树左单旋
- * @param {*} root 
- */
-function leftRotate(root) {
-    if (!root) return
-    let newRoot = root.right
-    root.right = newRoot.left
-    newRoot.left = root
-    return newRoot
-}
-
-/**
- * 二叉树右单旋
- * @param {*} root 
- */
-function rightRotate(root) {
-    if (!root) return
-    let newRoot = root.left
-    root.left = newRoot.right
-    newRoot.right = root
-    return newRoot
-}
-
-/**
- * 将树变为平衡二叉树
- * @param {*} root 
- * @returns 
- */
-function changeSearchTree(root) {
-    if (isBalance(root)) return root
-    if (!root) return
-    if (root.left) root.left = changeSearchTree(root.left)
-    if (root.right) root.right = changeSearchTree(root.right)
-    let left_deep = getDeep(root.left)
-    let right_deep = getDeep(root.right)
-    if (left_deep - right_deep > 1) {
-        // 左边深，需要右旋
-        let changeTreeDeep = getDeep(root.left.right)
-        let noChangeTreeDeep = getDeep(root.left.left)
-        if (changeTreeDeep > noChangeTreeDeep) root.left = leftRotate(root.left)
-        let newRoot = rightRotate(root)
-        newRoot = changeSearchTree(newRoot)
-        return newRoot
-    } else if (right_deep - left_deep > 1) {
-        // 右边深，需要左旋
-        let changeTreeDeep = getDeep(root.right.left)
-        let noChangTreeDeep = getDeep(root.right.right)
-        if (changeTreeDeep > noChangeTreeDeep) {
-            root.right = rightRotate(root.right)
-        }
-        let newRoot = leftRotate(root)
-        newRoot = changeSearchTree(newRoot)
+    /**
+     * 二叉树左单旋
+     * @param {*} root 
+     */
+    function leftRotate(root) {
+        if (!root) return
+        let newRoot = root.right
+        root.right = newRoot.left
+        newRoot.left = root
         return newRoot
     }
-    return root
-}
+
+    /**
+     * 二叉树右单旋
+     * @param {*} root 
+     */
+    function rightRotate(root) {
+        if (!root) return
+        let newRoot = root.left
+        root.left = newRoot.right
+        newRoot.right = root
+        return newRoot
+    }
+
+    /**
+     * 将树变为平衡二叉树
+     * @param {*} root 
+     * @returns 
+     */
+    function changeSearchTree(root) {
+        if (isBalance(root)) return root
+        if (!root) return
+        if (root.left) root.left = changeSearchTree(root.left)
+        if (root.right) root.right = changeSearchTree(root.right)
+        let left_deep = getDeep(root.left)
+        let right_deep = getDeep(root.right)
+        if (left_deep - right_deep > 1) {
+            // 左边深，需要右旋
+            let changeTreeDeep = getDeep(root.left.right)
+            let noChangeTreeDeep = getDeep(root.left.left)
+            if (changeTreeDeep > noChangeTreeDeep) root.left = leftRotate(root.left)
+            let newRoot = rightRotate(root)
+            newRoot = changeSearchTree(newRoot)
+            return newRoot
+        } else if (right_deep - left_deep > 1) {
+            // 右边深，需要左旋
+            let changeTreeDeep = getDeep(root.right.left)
+            let noChangTreeDeep = getDeep(root.right.right)
+            if (changeTreeDeep > noChangeTreeDeep) {
+                root.right = rightRotate(root.right)
+            }
+            let newRoot = leftRotate(root)
+            newRoot = changeSearchTree(newRoot)
+            return newRoot
+        }
+        return root
+    }
+```
+
+### 判断二叉树是否为二叉搜索树
+```
+    /**
+     * 判断一棵树是否为二叉搜索树
+     * @param {根节点} root 
+     */
+    function validTree(root, min_val = -Infinity, max_val = Infinity) {
+        if (!root) return true
+        if (root.value <= min_val || root.value >= max_val) return false;
+        return validTree(root.left, min_val, root.value) && validTree(root.right, root.value, max_val)
+    }
+
+    function isValidBST(root) {
+        return validTree(root)
+    }
 ```
