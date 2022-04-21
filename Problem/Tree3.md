@@ -91,7 +91,7 @@
 
 
 
-![截屏2022-04-20 22.19.53](/Users/lucasy/workspace/new_level/note/Problem/picture/红黑树-1.png)
+![截屏2022-04-20 22.19.53](/Problem/picture/红黑树-1.png)
 
 这时候，我们节点中新增一个值，得到的红黑树，就是这样一个结构，红色是什么意思呢？
 
@@ -99,7 +99,7 @@
 
 而且我们的树天生就是平衡的。
 
-![截屏2022-04-20 22.26.15](/Users/lucasy/workspace/new_level/note/Problem/picture/红黑树-2.png)
+![截屏2022-04-20 22.26.15](/Problem/picture/红黑树-2.png)
 
 
 
