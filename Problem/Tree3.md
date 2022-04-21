@@ -104,27 +104,27 @@
 
 ### 树节点
 ```
-function Node(value) {
-    this.value = value;
-    this.children = [];
-}
+    function Node(value) {
+        this.value = value;
+        this.children = [];
+    }
 
-let A = new Node('A')
-let B = new Node('B')
-let C = new Node('C')
-let D = new Node('D')
-let E = new Node('E')
-let F = new Node('F')
-let G = new Node('G')
+    let A = new Node('A')
+    let B = new Node('B')
+    let C = new Node('C')
+    let D = new Node('D')
+    let E = new Node('E')
+    let F = new Node('F')
+    let G = new Node('G')
 
-A.children.push(B)
-A.children.push(C)
-A.children.push(D)
+    A.children.push(B)
+    A.children.push(C)
+    A.children.push(D)
 
-B.children.push(E)
-B.children.push(F)
+    B.children.push(E)
+    B.children.push(F)
 
-D.children.push(G)
+    D.children.push(G)
 ```
 
 ### 树的深度优先搜索
