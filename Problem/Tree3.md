@@ -102,10 +102,66 @@
 ![截屏2022-04-20 22.26.15](/Problem/picture/红黑树-2.png)
 
 
+### 树节点
+```
+function Node(value) {
+    this.value = value;
+    this.children = [];
+}
+
+let A = new Node('A')
+let B = new Node('B')
+let C = new Node('C')
+let D = new Node('D')
+let E = new Node('E')
+let F = new Node('F')
+let G = new Node('G')
+
+A.children.push(B)
+A.children.push(C)
+A.children.push(D)
+
+B.children.push(E)
+B.children.push(F)
+
+D.children.push(G)
+```
 
 ### 树的深度优先搜索
-
+```
+    /**
+     * 树的深度优先搜索
+     * @param {*} root 
+     */
+    function deepSearchTree(root, target) {
+        if (!root || !target) return false
+        if (root.value == target) return true
+        let result = false
+        for (let i = 0; i < root.children.length; i++) {
+            result |= deepSearchTree(root.children[i], target)
+        }
+        return Boolean(result);
+    }
+```
 
 
 ### 树的广度优先搜索
-
+```
+    /**
+     * 树的广度优先搜索
+     * @param {*} roots 
+     * @param {*} target 
+     */
+    function dfs(roots, target) {
+        if (!roots || roots.length < 1 || !target) return false
+        let childs = []
+        for (let i = 0; i < roots.length; i++) {
+            if (roots[i].value == target) {
+                return true
+            } else {
+                childs = childs.concat(roots[i].children)
+            }
+        }
+        return dfs(childs, target)
+    }
+```
