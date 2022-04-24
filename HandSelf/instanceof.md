@@ -11,7 +11,6 @@ instanceof 运算符用于检测构造函数的 prototype 属性是否出现在�
      * @param {目标} target 
      */
     function myInstance(origin,target){
-        if(typeof target !== 'object') throw new TypeError(target + ' is not a object')
         cur = origin
         while(cur){
             if(cur === target.prototype){
