@@ -44,6 +44,8 @@ Object.create 来优化，能够帮我们创建一个空对象，真正意义上
         // 1、创建一个空对象
         // 2、为对象添加__proto__ 属性，并链接至构造函数的原型对象
         let constructor = Array.prototype.shift.call(arguments);
+        if(typeof constructor !== 'function') throw new TypeError(constructor + ' is not a func')
+        
         let obj = Object.create(constructor.prototype);
         // 3、步骤1新创建的对象作为this的上下文
         let result = constructor.apply(obj, Array.prototype.slice.call(arguments));
