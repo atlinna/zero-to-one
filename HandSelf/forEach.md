@@ -76,3 +76,29 @@ arr.forEach(callback(currentValue [, index [, array]])[, thisArg])
 ```
 
 #### 分析：
+1、
+```
+    // 1. Let O be the result of calling toObject() passing the
+    // |this| value as the argument.
+    var O = Object(this);
+```
+首先，看上面这行代码，这个是做什么用的？
+
+2、
+```
+    // 2. Let lenValue be the result of calling the Get() internal
+    // method of O with the argument "length".
+    // 3. Let len be toUint32(lenValue).
+    var len = O.length >>> 0;
+```
+这行代码又做了些什么呢？
+
+先看第一个问题
+**-1-**
+理想状态下我们使用数组调用， this 自然指向的是我们的数组，但是如果使用 call 或 apply 的方式使用其他的数据类型来掉用 forEach 方法，那是不是就出现问题了？ 使用 Object(this) 的原因就是把我们的数据包装成一个对象。
+但是我们自己尝试的时候发现，不管我用的是不是一个对象，最后打印出来，就是一个对象类型的数据。这是因为，非严格模式下，改变 this 指向，this 都会被包装成一个对象，但在严格模式下不会。
+这个的作用就是处理传入的数据非数组的情况。
+
+
+**-2-**
+这个的作用就是防止你的length属性是 null 或 undefined 。
