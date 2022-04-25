@@ -10,3 +10,6 @@
 
 + [【new】](/new.md)
 + [【instanceof】](/instanceof.md)
++ [【call】](/call.md)
++ [【apply】](/apply.md)
++ [【bind】](/bind.md)
