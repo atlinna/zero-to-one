@@ -13,3 +13,4 @@
 + [【call】](/call.md)
 + [【apply】](/apply.md)
 + [【bind】](/bind.md)
++ [【Array.isArray】](/isArray.md)
