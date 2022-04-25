@@ -17,7 +17,8 @@ Function.prototype
 + [【bind】](/bind.md)
 
 Array.prototype
-+ [【Array.isArray】](/isArray.md)
++ [【isArray】](/isArray.md)
++ [【forEach】](/forEach.md)
 
 
 Object.prototype
