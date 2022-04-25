@@ -10,7 +10,14 @@
 
 + [【new】](/new.md)
 + [【instanceof】](/instanceof.md)
+
+Function.prototype
 + [【call】](/call.md)
 + [【apply】](/apply.md)
 + [【bind】](/bind.md)
+
+Array.prototype
 + [【Array.isArray】](/isArray.md)
+
+
+Object.prototype
