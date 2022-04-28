@@ -19,6 +19,7 @@ Function.prototype
 Array.prototype
 + [【isArray】](/isArray.md)
 + [【forEach】](/forEach.md)
++ [【map】](/map.md)
 
 
 Object.prototype
