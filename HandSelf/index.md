@@ -23,3 +23,5 @@ Array.prototype
 
 
 Object.prototype
++ [【create】](/create.md)
++ 
