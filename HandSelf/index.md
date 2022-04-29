@@ -25,3 +25,4 @@ Array.prototype
 Object.prototype
 + [【create】](/create.md)
 + [【assign】](/assign.md)
++ [【freeze】](/freeze.md)
