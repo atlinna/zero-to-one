@@ -26,3 +26,7 @@ Object.prototype
 + [【create】](/create.md)
 + [【assign】](/assign.md)
 + [【freeze】](/freeze.md)
+
+
+Promise
++ [【手写Promise 20行】](/Promise-20.md)
