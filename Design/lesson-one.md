@@ -208,7 +208,62 @@ ok。
 
 这种就是典型的通过增加耦合度来降低复杂度的例子，下面我们通过伪代码来模拟一下。
 
-
+假设我们有一个 ul 
+```
+  <ul id="chess-list"></ul>
+```
+现在的需求是让你通过网络请求，获取列表中的内容，并将其渲染到页面上。
+粗略一看很简单是吧
+``` 
+  function getView(url,data,container){
+    // 网络资源请求数据
+    $.ajax({
+      url:url,
+      data:data,
+      success:function (json){
+        // 在这里我们能够拿到 一个 json 数据对吧 假设格式是[{name:'zhang san'},{name:'li si'}]
+        // 渲染到页面
+        let renderStr = json.reduce((prev,item) => prev + '<li>' + item.name + '</li>','')
+        container.innerHTML = renderStr;
+      }
+    })
+  }
+```
+看着实现起来挺简单的对吧，但是某一天，领导说，诶 这个需求变更一下，说首次请求太浪费请求资源了，添加一个缓存机制。
+我们缓存怎么弄？ 是不是整一个副本给他存放到本地，然后当我进来的时候如果有缓存值就取本地的，没有就进行网络请求。
+我们把之前的代码 copy 过来。然后继续添加，为了方便观看 会给注释添加序号。
+``` 
+  function getView(url,data,container){
+    // 2 - 添加缓存
+    let catchStr = localStorage.getItem('list')
+    if(catchStr){
+      // 2 - 缓存值存在，取缓存数据进行渲染
+      let json = JSON.parse(catchStr);
+      // 2-1 - 在这里我们能够拿到 一个 json 数据对吧 假设格式是[{name:'zhang san'},{name:'li si'}]
+      // 2-1 - 渲染到页面
+      let renderStr = json.reduce((prev,item) => prev + '<li>' + item.name + '</li>','')
+      container.innerHTML = renderStr;
+      
+    } else {
+      // 2 - 没有缓存值，则进行网络请求 
+      // 1 - 网络资源请求数据
+      $.ajax({
+        url:url,
+        data:data,
+        success:function (json){
+          // 2 - 也就是说我们在取得网络资源时，先将其存储到 localStorage 中。
+          localStorage.setItem('list',JSON.stringify(json));
+          // 1 - 在这里我们能够拿到 一个 json 数据对吧 假设格式是[{name:'zhang san'},{name:'li si'}]
+          // 1 - 渲染到页面
+          let renderStr = json.reduce((prev,item) => prev + '<li>' + item.name + '</li>','')
+          container.innerHTML = renderStr;
+        }
+      })
+    }
+  }
+```
+嗯···我们发现 getView 函数，变得复杂了一些，但是还好对吧。一些逻辑还是能够分的很清楚的，但实际上，我们可以看出，有些代码，他就是重复的比如渲染那块，就直接 control + C ，
+control + V, 这··是不是有点了对吧。
 
 
 
