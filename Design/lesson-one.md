@@ -265,6 +265,109 @@ ok。
 嗯···我们发现 getView 函数，变得复杂了一些，但是还好对吧。一些逻辑还是能够分的很清楚的，但实际上，我们可以看出，有些代码，他就是重复的比如渲染那块，就直接 control + C ，
 control + V, 这··是不是有点了对吧。
 
+我们发现，这个函数的规模会随着我们的需求更迭不断的变大，复杂度越来越大，当有一天，就加到我们自己都看不懂的时候，就没有办法了，所以，这时候单一职责原则派上了用场。
+各司其职。
+假设我们以函数的形式，
+```
+  // 请求网络资源
+  function getSource(){}
+  // 渲染
+  function render(){}
+  // 缓存
+  function cache(){}
+  // 如果再有新的需求，比如离线缓存
+  function onlineCache(){}
+  ··· 等等。
+```
+函数之间相互调用，存然增加了耦合度，但是相应的，我们的复杂度也减少了。
+但是这样看起来还是不够直观对吧？，我们可以试一下使用对象的方式。
+```
+  function WebSource(callbackArray,url,params){
+    this.callbackArray = callbackArray;
+    this.url = url;
+    this.params = params;
+    this.do = function (){
+      $.ajax({
+        url:this.url,
+        data:this.params,
+        success: function (json){
+          // pass 占位
+        }
+      })
+    }
+  }
+```
+写到 success 后面不知道取了数据之后干什么了对吧，我们先进行其他的
+```
+  function Cache(key){
+    // do 函数要做的是将传入的数据缓存起来对吧
+    this.do = function (data){
+      localStorage.setItem(key,JSON.stringify(data));
+    }
+    // 然后我们还要能够取到这个缓存值
+    this.getCacheValue = function (){
+      localStorage.getItem(key);
+    }
+  }
+```
+缓存的构造函数就 OK 啦。
+然后是渲染
+```
+  function Render(container){
+    this.container = container;
+    this.do = function (data){
+      // 这里我就把之前的 copy 过来了
+      let renderStr = data.reduce((prev,item) => prev + '<li>' + item.name + '</li>','')
+      this.container.innerHTML = renderStr;
+    }
+  }
+```
+好的 前置工作准备完了，我们看下数据获取那里 如何使用。（再 copy 一份过来）
+```
+  function WebSource(callbackArray,url,params){
+    this.callbackArray = callbackArray;
+    this.url = url;
+    this.params = params;
+    this.do = function (){
+      $.ajax({
+        url:this.url,
+        data:this.params,
+        success: function (json){
+          // pass 占位
+        }
+      })
+    }
+  }
+```
+首先我们要明确，网络资源请求完毕要做什么？ 是不是要进行数据缓存、视图渲染啊？ 那么我们的 callbackArray 传入的应该是什么呢？
+首先要保证能够进行缓存，然后还要保证能够进行视图的渲染。 我们发现这些功能都存在于他们各自的 do 方法上。
+也就是说，我要传入一个能够调用 do 方法的实例对吧。
+```
+  const cacheObj = new Cache('list')
+  const renderObj = new Render(xxx) // xxx 代表你传入的这个容器
+  // 然后呢？ 实例化我们的 WebSource 
+  // const sourceObj = new WebSource([],'xxx',{xxx:'xxx'}) 那么这个数组里面放什么？是他们的实例
+  const sourceObj = new WebSource([cacheObj,renderObj],'xxx',{xxx:'xxx'})
+```
+相互的一个调用关系就形成了对吧？ 然后我们回到 WebSource 的构造函数中，完成剩余的部分
+```
+    function WebSource(callbackArray,url,params){
+    this.callbackArray = callbackArray;
+    this.url = url;
+    this.params = params;
+    this.do = function (){
+      $.ajax({
+        url:this.url,
+        data:this.params,
+        success: function (json){
+          // 拿到数据后进行缓存与渲染
+          callbackArray.forEach(obj => obj.do(json))
+        }
+      })
+    }
+  }
+```
+OK ~ 就是这么的简洁，你会发现，当你有其他的需求增加的时候，你只需要再构造函数中扩展，或者修改某个构造函数里面的方法，使其满足你的需求。这样你就能直接定位你的问题位置，不再需要去找逻辑了对吧？
 
 
 
