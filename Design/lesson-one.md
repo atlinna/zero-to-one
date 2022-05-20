@@ -388,6 +388,30 @@ OK ~ 就是这么的简洁，你会发现，当你有其他的需求增加的时
 **使用设计模式的六大原则三 -- 里氏替换原则 L Subsituation Principle**
 
 任何基类可以出现的地方，子类一定可以出现。通俗来说就是：子类可以扩展父类的 功能，但不能改变父类原有的功能。
+这句话什么意思呢？ 就是让你使用继承的方式来扩展父类，但是不让你重写父类的方法。
+比方说我们有这样两个构造函数，Son 继承 Father,然后重写了 Father 的 eat 方法。
+```
+function Father() {
+    this.eat = function () {
+        console.log('i like eat egg!');
+    }
+}
+
+let f = new Father()
+Son.prototype = f;
+function Son() {
+    this.eat = function () {
+        console.log('i like eat apple');
+    }
+}
+let s = new Son()
+f.eat()
+s.eat()
+console.log(s);
+```
+打印出来结果应该是 // i like eat egg! 和 // i like eat apple 对吧？这时候把父类的方法重写了，可能会造成一些不可预测的结果。
+里氏替换原则的核心思想就是，希望你通过继承去扩展的方式降低复杂度，最最最重要的一点就是，他希望你继承的是一个动作，而不是一个行为。
+比方说，刚刚的 Father 和 Son 对吧，如果父类 Father 提供的 eat 只是一个吃的动作，那么他们自身就可以通过扩展其他的方法来实现喜欢吃什么。
 
 
 
