@@ -163,3 +163,23 @@
 
   这次，我们创建实例的构造函数保持一致，且变量也持久化。
 
+
+
+### 单例模式生成器
+
+我们知道了如何创建单例模式，但是，创建他的话是不是不小的手笔。
+
+所以我们为了解决它，让不会使用，不知道的人也能得到一个单例模式。我们就需要封装一个生成器。
+
+```
+        var getSingle = function (func) {
+            var ret = null;
+            return function () {
+                if (!ret) {
+                    ret = func.apply(this, arguments)
+                }
+                return ret;
+            }
+        }
+```
+
