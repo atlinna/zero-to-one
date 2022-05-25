@@ -49,4 +49,4 @@
 ```
 为什么呢？
 我们 var 声明的变量的初始值是 undefined，函数声明的值是 function(){}
-也就是说 当 foo 执行的时候 foo 为 undefined 我们对 undefined() 调用。 TypeError。他会告诉你 undefined 不是 function
+也就是说 当 foo 执行的时候 foo 为 undefined 我们对 undefined() 调用。 TypeError。他会告诉你 foo 不是 function
