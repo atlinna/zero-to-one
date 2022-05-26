@@ -50,3 +50,28 @@
 为什么呢？
 我们 var 声明的变量的初始值是 undefined，函数声明的值是 function(){}
 也就是说 当 foo 执行的时候 foo 为 undefined 我们对 undefined() 调用。 TypeError。他会告诉你 foo 不是 function
+
+如果 var 声明 和 函数声明 声明的是同一个会发生什么？
+```
+console.log(foo);
+
+var foo;
+function foo() {
+    console.log(2);
+}
+```
+我们发现打印结果是 foo 函数，调换他们的位置,发现结果是相同的。
+**函数声明和变量声明都会被提升。 函数会首先被提升，然后才是变量。**
+
+在看下面
+```
+function foo() {
+    console.log(2);
+}
+
+var foo;
+console.log(foo);
+```
+如果只是在函数后声明了变量，但没有赋值，foo 还是函数。
+
+
