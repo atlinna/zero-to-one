@@ -33,3 +33,73 @@
   调用对象代理处理另外一些事情，如垃圾回收机制增加额外服务。
 
   提供额外的其他服务 火车站代售
+  
+我们一起来看下代理模式是怎么运作的
+假设，我有一个朋友叫小明，小明呢交友广泛，最喜欢的事情就是找女朋友，然后呢他追女孩的手段就是送花。
+我们构建一个对象出来。
+```
+    var XiaoMing = {
+        like: null,
+        findTarget: function (target) {
+            this.like = target;
+        },
+        way: 'flower',
+        sendFlower: function (target) {
+            target.receiveFlower()
+        }
+    }
+```
+然后小明呢也不是随便的人，他呢喜欢颜值高的女生。不是见一个爱一个,然后我们粗略的修改一下我们的方法
+我们说这个小明啊，首先会把女孩的研制先筛选一遍，然后从心仪的女孩**们**中随便找一个，开启猛烈的攻势。
+```
+    function createRandom(max, min) {
+        let t = Math.floor(Math.random() * (max + 1 - min)) + min
+        return t
+    }
+
+    var XiaoMing = {
+        like: null,
+        findTarget: function (targetArr) {
+            if (!targetArr || targetArr.length) return
+            let highYanzhi = targetArr.filter(item => item.yanzhi > 80); // 我们假设小明喜欢颜值高于80的女生
+            let key = createRandom(highYanzhi.length, 0);
+            this.like = highYanzhi[key];
+        },
+        way: 'flower',
+        sendFlower: function (target) {
+            target.receiveFlower()
+        },
+    }
+```
+OK ，然后就是女孩，女孩的特性差不多都是相同的，这里我们使用一个构造函数来创建。
+首先，女生需要有颜值对吧，有姓名，然后呢她还能接受小明送出的花。
+```
+function Girl(yanzhi, name) {
+    this.yanzhi = yanzhi;
+    this.name = name;
+    this.receiveFlower = function () {
+      // pass
+    }
+}
+```
+我们假设女孩子会有小脾气对吧，而且呢，这个小脾气阴晴不定，时好时坏的。这时候我们增加一些属性和方法来描述女孩的心情。
+```
+    function Girl(yanzhi, name) {
+        this.yanzhi = yanzhi;
+        this.name = name;
+        this.mood = null;
+        this.timer = null;
+        this.receiveFlower = function () {
+            changeMood();
+        }
+        this.changeMood = function () {
+            this.timer = setInterval(function () {
+                createMood()
+            }, 300);
+        }
+        function createMood() {
+            this.mood = Math.random() > 0.5;
+            console.log(this.name, this.mood);
+        }
+    }
+```
