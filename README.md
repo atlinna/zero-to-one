@@ -1,4 +1,6 @@
-## from zero to one -- js review
+**所有文章均已迁移至[https://atlinna.github.io/](https://atlinna.github.io/)**
+
+<!-- ## from zero to one -- js review
 **HTML**
 - - -
 
@@ -56,4 +58,4 @@
 
 
 **其他**
-+ [前端100问](https://github.com/yygmind/blog/issues/43)
++ [前端100问](https://github.com/yygmind/blog/issues/43) -->
